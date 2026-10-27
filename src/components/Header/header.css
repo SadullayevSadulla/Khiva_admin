@@ -1,0 +1,35 @@
+.khiva-header {
+  height: 70px;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.25); /* Xiva oltinrang hoshiyasi */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-page-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* Ant Design button hover effektlarini to'g'rilash */
+.menu-toggle-btn:hover,
+.theme-toggle-btn:hover {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-radius: 8px !important;
+}
