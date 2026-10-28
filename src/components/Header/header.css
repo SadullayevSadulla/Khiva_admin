@@ -1,6 +1,6 @@
 .khiva-header {
   height: 70px;
-  border-bottom: 1px solid rgba(245, 158, 11, 0.25); /* Xiva oltinrang hoshiyasi */
+  background: var(--surface-bg);
   display: flex;
   justify-content: space-between;
   align-items: center;

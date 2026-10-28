@@ -17,6 +17,9 @@ export default function Header({ theme, onToggleTheme }) {
     '/chipta-tariflari': "Chipta Ta'riflari",
     '/sotilgan-chiptalar': 'Sotilgan Chiptalar',
     '/adminlar': 'Adminlar',
+    '/collaction': 'Kolleksiyalar',
+    '/collaction/add': 'Kolleksiya qo‘shish',
+    '/collaction/edit': 'Kolleksiya tahrirlash'
   };
 
   return (

@@ -5,7 +5,11 @@ import Dashboard from "./pages/Dashboard/dashboard";
 import Login from "./pages/Login/login";
 import { ProtectedRoute } from "./router/ProtectedRoute";
 import Xodimlar from "./pages/Xodimlar/xodimlar";
+import EditEmployee from "./pages/Xodimlar/EditEmployee"; // <- Xodimni tahrirlash sahifasi
 import Header from "./components/Header/header";
+import AddEmployee from "./pages/Xodimlar/AddEmployee";
+import Collaction from "./pages/Collaction/collaction";
+import CollactionAdd from "./pages/Collaction/collactionAdd";
 
 function AdminLayout({ theme, onToggleTheme }) {
   return (
@@ -40,7 +44,13 @@ function App() {
       <Route element={<ProtectedRoute><AdminLayout theme={theme} onToggleTheme={toggleTheme} /></ProtectedRoute>}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/xodimlar" element={<Xodimlar />} />
+        <Route path="/xodimlar/qoshish" element={<AddEmployee />} />     
+        <Route path="/xodimlar/tahrirlash/:id" element={<EditEmployee />} /> 
+        <Route path="/collaction" element={<Collaction/>} />
+        <Route path="/collaction/add" element={<CollactionAdd />} />
+        <Route path="/collaction/add/:cid" element={<CollactionAdd />} />
       </Route>
+
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );

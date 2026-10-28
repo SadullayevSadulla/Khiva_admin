@@ -1,19 +1,19 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './sideBar.css';
-import { 
-  Home, 
-  Briefcase, 
-  Layers, 
-  Newspaper, 
-  Megaphone, 
-  Image as ImageIcon, 
-  Users, 
-  Mail, 
-  Ticket, 
-  CheckSquare, 
-  UserCog, 
-  LogOut 
+import {
+  Home,
+  Briefcase,
+  Layers,
+  Newspaper,
+  Megaphone,
+  Image as ImageIcon,
+  Users,
+  Mail,
+  Ticket,
+  CheckSquare,
+  UserCog,
+  LogOut
 } from 'lucide-react';
 
 const SideBar = () => {
@@ -43,12 +43,16 @@ const SideBar = () => {
         </li>
         <li>
           <NavLink to="/xodimlar" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
-            <span className="icon"><Briefcase size={20} /></span>
+            <span className="icon"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16">
+              <path d="M0 0h16v16H0z" fill="none" />
+              <path fill="currentColor" d="M5 4V2.5A1.5 1.5 0 0 1 6.5 1h3A1.5 1.5 0 0 1 11 2.5V4h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm1-1.5V4h4V2.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5m-4 7V13a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V9.5c-.418.314-.937.5-1.5.5H9v.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V10H3.5A2.5 2.5 0 0 1 2 9.5M7 9v-.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5V9h3.5A1.5 1.5 0 0 0 14 7.5V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1.5A1.5 1.5 0 0 0 3.5 9z" />
+            </svg>
+            </span>
             <span className="text">Xodimlar</span>
           </NavLink>
         </li>
         <li>
-          <NavLink to="/kolleksiyalar" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
+          <NavLink to="/collaction" className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}>
             <span className="icon"><Layers size={20} /></span>
             <span className="text">Kolleksiyalar</span>
           </NavLink>

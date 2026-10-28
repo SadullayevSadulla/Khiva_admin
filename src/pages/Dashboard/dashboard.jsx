@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../api';
+import Loader from '../../components/Loader/loader';
 
 export default function Dashboard() {
   const [news, setNews] = useState([]);
@@ -47,13 +48,16 @@ export default function Dashboard() {
   const getMainImage = (item) =>
     item.images?.find((image) => image.mainImage)?.url || item.images?.[0]?.url;
 
+  if (loading) return <Loader />;
+
   return (
     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
       {loadError && <p className="md:col-span-2 text-red-500">{loadError}</p>}
+
       <section>
         <h1 className="mb-2 text-xl font-bold">So'nggi yangiliklar</h1>
         <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
-          {loading ? <p>Yangiliklar yuklanmoqda...</p> : news.length ? news.slice(0, 3).map((item) => (
+          {news.length ? news.slice(0, 3).map((item) => (
             <article key={item.id} className="w-full min-w-0 rounded-lg bg-light-main shadow dark:bg-dark-main">
               {getMainImage(item) && (
                 <div className="group mb-2 aspect-video w-full overflow-hidden rounded-t-lg">
@@ -77,7 +81,7 @@ export default function Dashboard() {
       <section>
         <h1 className="mb-2 text-xl font-bold">So'nggi e'lonlar</h1>
         <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
-          {loading ? <p>E’lonlar yuklanmoqda...</p> : announcements.length ? announcements.slice(0, 2).map((item) => (
+          {announcements.length ? announcements.slice(0, 2).map((item) => (
             <article key={item.id} className="w-full min-w-0 rounded-lg bg-light-main shadow dark:bg-dark-main">
               {getMainImage(item) && (
                 <div className="group mb-2 aspect-video w-full overflow-hidden rounded-t-lg">

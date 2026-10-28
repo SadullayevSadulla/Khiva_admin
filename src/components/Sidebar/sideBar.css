@@ -21,8 +21,8 @@
 }
 
 .logo-icon .icon{
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
 }
 
 .logo-title {
@@ -77,11 +77,6 @@
   color: var(--text-primary);
 }
 
-.menu-item.active {
-  background-color: #f59e0b;
-  color: #111827;
-  font-weight: 600;
-}
 
 .menu-item .icon {
   display: flex;
