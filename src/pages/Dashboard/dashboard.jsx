@@ -1,10 +1,49 @@
 import { useEffect, useState } from 'react';
-import api from '../../api';
+import { Newspaper, Megaphone, Briefcase, Layers } from 'lucide-react';
+import api, { fileUrl } from '../../api';
 import Loader from '../../components/Loader/loader';
+import './dashboard.css';
+
+const getMainImage = (item) =>
+  fileUrl(item.images?.find((image) => image.mainImage)?.url || item.images?.[0]?.url);
+
+function FeedItem({ item }) {
+  const image = getMainImage(item);
+
+  return (
+    <article className="feed-item">
+      <div className="feed-thumb">
+        {image ? <img src={image} alt={item.title?.uz || ''} /> : <img src="/logo.png" alt="" className="feed-thumb-empty" />}
+      </div>
+      <div className="feed-body">
+        <h3 className="feed-title">{item.title?.uz || 'Nomsiz'}</h3>
+        <div
+          dangerouslySetInnerHTML={{ __html: item.description?.uz || '' }}
+          className="feed-text"
+        />
+      </div>
+    </article>
+  );
+}
+
+function Stat({ icon: Icon, label, value }) {
+  return (
+    <div className="stat panel">
+      <span className="stat-icon">
+        <Icon size={22} />
+      </span>
+      <div>
+        <div className="stat-value">{value ?? '—'}</div>
+        <div className="stat-label">{label}</div>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const [news, setNews] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+  const [counts, setCounts] = useState({ employees: null, collections: null });
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
 
@@ -15,10 +54,13 @@ export default function Dashboard() {
       setLoading(true);
       setLoadError('');
 
-      const [newsResult, announcementsResult] = await Promise.allSettled([
-        api.get('/api/news'),
-        api.get('/api/announcement'),
-      ]);
+      const [newsResult, announcementsResult, employeesResult, collectionsResult] =
+        await Promise.allSettled([
+          api.get('/api/news'),
+          api.get('/api/announcement'),
+          api.get('/api/admin/employee'),
+          api.get('/api/admin/collection'),
+        ]);
 
       if (!active) return;
 
@@ -31,6 +73,18 @@ export default function Dashboard() {
         const announcementData = announcementsResult.value.data?.data;
         setAnnouncements(Array.isArray(announcementData) ? announcementData : []);
       }
+
+      const nextCounts = { employees: null, collections: null };
+      if (employeesResult.status === 'fulfilled') {
+        const list = employeesResult.value.data?.data;
+        nextCounts.employees = Array.isArray(list) ? list.length : null;
+      }
+      if (collectionsResult.status === 'fulfilled') {
+        const body = collectionsResult.value.data;
+        const list = body?.data || body || [];
+        nextCounts.collections = body?.total ?? body?.count ?? (Array.isArray(list) ? list.length : null);
+      }
+      setCounts(nextCounts);
 
       if (newsResult.status === 'rejected' && announcementsResult.status === 'rejected') {
         setLoadError('Yangilik va e’lonlarni yuklab bo‘lmadi. API manzilini tekshiring.');
@@ -45,62 +99,30 @@ export default function Dashboard() {
     };
   }, []);
 
-  const getMainImage = (item) =>
-    item.images?.find((image) => image.mainImage)?.url || item.images?.[0]?.url;
-
   if (loading) return <Loader />;
 
   return (
-    <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-      {loadError && <p className="md:col-span-2 text-red-500">{loadError}</p>}
+    <div className="dash">
+      {loadError && <p className="dash-error">{loadError}</p>}
+      <div className="feeds">
+        <section className="panel feed">
+          <h2 className="feed-heading">So'nggi yangiliklar</h2>
+          {news.length ? (
+            news.slice(0, 3).map((item) => <FeedItem key={item.id} item={item} />)
+          ) : (
+            <p className="feed-empty">Hozircha yangiliklar yo'q.</p>
+          )}
+        </section>
 
-      <section>
-        <h1 className="mb-2 text-xl font-bold">So'nggi yangiliklar</h1>
-        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
-          {news.length ? news.slice(0, 3).map((item) => (
-            <article key={item.id} className="w-full min-w-0 rounded-lg bg-light-main shadow dark:bg-dark-main">
-              {getMainImage(item) && (
-                <div className="group mb-2 aspect-video w-full overflow-hidden rounded-t-lg">
-                  <img src={getMainImage(item)} alt={item.title?.uz || ''} className="h-full w-full object-cover" />
-                </div>
-              )}
-              <div className="flex-1 px-2 pb-2">
-                <h2 className="min-h-10 line-clamp-2 text-lg font-medium leading-[110%]">
-                  {item.title?.uz}
-                </h2>
-                <div
-                  dangerouslySetInnerHTML={{ __html: item.description?.uz || '' }}
-                  className="my-2 line-clamp-3 text-sm leading-[130%]"
-                />
-              </div>
-            </article>
-          )) : <p>Hozircha yangiliklar yo'q.</p>}
-        </div>
-      </section>
-
-      <section>
-        <h1 className="mb-2 text-xl font-bold">So'nggi e'lonlar</h1>
-        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">
-          {announcements.length ? announcements.slice(0, 2).map((item) => (
-            <article key={item.id} className="w-full min-w-0 rounded-lg bg-light-main shadow dark:bg-dark-main">
-              {getMainImage(item) && (
-                <div className="group mb-2 aspect-video w-full overflow-hidden rounded-t-lg">
-                  <img src={getMainImage(item)} alt={item.title?.uz || ''} className="h-full w-full object-cover" />
-                </div>
-              )}
-              <div className="flex-1 px-2 pb-2">
-                <h2 className="min-h-10 line-clamp-2 text-lg font-medium leading-[110%]">
-                  {item.title?.uz}
-                </h2>
-                <div
-                  dangerouslySetInnerHTML={{ __html: item.description?.uz || '' }}
-                  className="my-2 line-clamp-3 text-sm leading-[130%]"
-                />
-              </div>
-            </article>
-          )) : <p>Hozircha e'lonlar yo'q.</p>}
-        </div>
-      </section>
+        <section className="panel feed">
+          <h2 className="feed-heading">So'nggi e'lonlar</h2>
+          {announcements.length ? (
+            announcements.slice(0, 3).map((item) => <FeedItem key={item.id} item={item} />)
+          ) : (
+            <p className="feed-empty">Hozircha e'lonlar yo'q.</p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

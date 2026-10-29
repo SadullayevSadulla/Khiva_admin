@@ -1,55 +1,271 @@
 @import "tailwindcss";
-
-:root {
-  font-family: Inter, sans-serif;
-  color-scheme: dark;
-  --app-bg: #2c2a2a;
-  --surface-bg: #1a1a1a;
-  --surface-border: #2a2a2a;
-  --text-primary: #ffffff;
-  --text-muted: #c7c7c7;
-  --hover-bg: rgba(255, 255, 255, 0.05);
-  --scrollbar-thumb: #333333;
+:root,[data-theme="light"] {
+  color-scheme: light;
+  --bg: #eaf0ee;
+  --surface: #ffffff;
+  --surface-2: #f3f7f6;
+  --line: #d6e0dd;
+  --text: #14282e;
+  --muted: #5a6f76;
+  --accent: #c4501a;
+  --accent-hover: #a94312;
+  --on-accent: #ffffff;
+  --teal: #137a8e;
+  --teal-soft: rgba(19, 122, 142, 0.1);
+  --sand: #d8b27a;
+  --danger: #c23b2e;
+  --ok: #1e8a5a;
+  --hover: rgba(20, 40, 46, 0.06);
+  --shadow: 0 1px 2px rgba(11, 58, 71, 0.06), 0 8px 24px rgba(11, 58, 71, 0.06);
+  --sidebar: #0b3a47;
+  --sidebar-text: #e8e1d1;
+  --sidebar-muted: #9db8bf;
 }
 
-.admin-shell[data-theme="light"] {
-  color-scheme: light;
-  --app-bg: #f4f6f8;
-  --surface-bg: #ffffff;
-  --surface-border: #e5e7eb;
-  --text-primary: #111827;
-  --text-muted: #64748b;
-  --hover-bg: rgba(15, 23, 42, 0.06);
-  --scrollbar-thumb: #d1d5db;
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0a1619;
+  --surface: #122328;
+  --surface-2: #172c32;
+  --line: #24404a;
+  --text: #ede8dc;
+  --muted: #8fa7ad;
+  --accent: #ee7b3e;
+  --accent-hover: #f68d55;
+  --on-accent: #1a0d05;
+  --teal: #3bb0c4;
+  --teal-soft: rgba(59, 176, 196, 0.14);
+  --sand: #d8b27a;
+  --danger: #f0705f;
+  --ok: #4cc38a;
+  --hover: rgba(237, 232, 220, 0.07);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.25);
+  --sidebar: #071e26;
+  --sidebar-text: #e8e1d1;
+  --sidebar-muted: #7f9ca4;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
-  background-color: var(--app-bg);
-  color: var(--text-primary);
+  font-family: Manrope, system-ui, -apple-system, "Segoe UI", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+h1,h2,h3 {
+  font-family: Marcellus, Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+
+:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
 }
 
 .admin-shell {
+  display: flex;
   min-height: 100vh;
-  background-color: var(--app-bg);
-  color: var(--text-primary);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+.admin-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-content {
-  color: var(--text-primary);
+  flex: 1;
+  padding: 28px;
+  color: var(--text);
 }
 
-::-webkit-scrollbar{
-  width: 10px;
+@media (max-width: 640px) {
+  .admin-content {
+    padding: 18px 14px;
+  }
 }
 
-::-webkit-scrollbar-track{
-  background-color: #f1f1f1;
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
 }
 
-::-webkit-scrollbar-thumb{
-  background-color: #e19d3b;
-  border:1px solid #fff;
+.page-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.page-bar-info {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
   border-radius: 10px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--hover);
+  border-color: var(--teal);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+}
+
+.btn-sm {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(7, 30, 38, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 24px 24px;
+  text-align: center;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.modal-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.modal-text {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.modal-actions .btn {
+  min-width: 100px;
+}
+
+.table-panel {
+  overflow: hidden;
+}
+
+.table-panel .ant-table {
+  background: transparent;
+  color: var(--text);
+}
+
+.table-panel .ant-table-thead > tr > th {
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--line);
+}
+
+.table-panel .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+
+.table-panel .ant-table-tbody > tr:hover > td {
+  background: var(--teal-soft);
+}
+
+.table-panel .ant-pagination {
+  padding: 0 16px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--teal) 45%, transparent);
+  border: 2px solid var(--bg);
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

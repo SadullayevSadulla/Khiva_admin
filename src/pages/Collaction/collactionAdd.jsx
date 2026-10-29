@@ -241,7 +241,7 @@ export default function CollactionAdd() {
                 ))}
               </div>
             </div>
-            <div style={{ background: 'var(--bg-editor, transparent)', border: '1px solid #4b5563', borderRadius: '8px', overflow: 'hidden' }}>
+               <div className="editor-box">
               <Controller
                 name={`content.${activeLangC}`}
                 control={control}

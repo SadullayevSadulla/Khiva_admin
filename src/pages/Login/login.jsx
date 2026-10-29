@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api'; 
+import { Eye, EyeOff } from 'lucide-react';
+import api from '../../api';
 import './login.css';
 
 export default function Login() {
@@ -10,6 +11,7 @@ export default function Login() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   // Inputlar o'zgarganda avtomatik yangilab turish uchun
@@ -64,42 +66,69 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page-bg">
-      <div className="login-container">
-        <form onSubmit={handleLogin} className="login-form">
-          <h2>Khiva Admin - Kirish</h2>
-          
-          {error && <div className="error-alert">{error}</div>}
+    <div className="lg-page" data-theme="light">
+      <aside className="lg-photo">
+        <div className="lg-photo-text">
+          <h2>Xiva muzeyi</h2>
+          <p>Kolleksiyalar, xodimlar, yangiliklar va chiptalarni bir joydan boshqaring.</p>
+        </div>
+      </aside>
 
-          <div className="input-group">
-            <label>Email</label>
+      <main className="lg-panel">
+        <form onSubmit={handleLogin} className="lg-form">
+          <img src="/logo.png" alt="Xiva muzeyi logotipi" className="lg-logo" />
+          <h1 className="lg-title">Boshqaruv paneliga kirish</h1>
+          <p className="lg-sub">Davom etish uchun email va parolingizni kiriting.</p>
+
+          {error && (
+            <div className="lg-error" role="alert">
+              {error}
+            </div>
+          )}
+
+          <div className="lg-field">
+            <label htmlFor="email">Email</label>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
+              autoComplete="username"
               placeholder="admin@example.com"
             />
           </div>
 
-          <div className="input-group">
-            <label>Parol</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              placeholder="********"
-            />
+          <div className="lg-field">
+            <label htmlFor="password">Parol</label>
+            <div className="lg-password">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                autoComplete="current-password"
+                placeholder="********"
+              />
+              <button
+                type="button"
+                className="lg-eye"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Parolni yashirish' : 'Parolni ko‘rsatish'}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
-          <button type="submit" className="login-btn" disabled={loading}>
+          <button type="submit" className="lg-btn" disabled={loading}>
             {loading ? 'Tekshirilmoqda...' : 'Kirish'}
           </button>
         </form>
-      </div>
+      </main>
     </div>
   );
 }

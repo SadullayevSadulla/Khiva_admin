@@ -1,42 +1,48 @@
-import { Button } from 'antd';
-import { MoonOutlined, SunOutlined, MenuOutlined } from '@ant-design/icons';
+import { Moon, Sun, Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import './header.css';
 
-export default function Header({ theme, onToggleTheme }) {
+const pageTitles = {
+  '/dashboard': 'Bosh menyu',
+  '/xodimlar': 'Xodimlar',
+  '/kolleksiyalar': 'Kolleksiyalar',
+  '/yangiliklar': 'Yangiliklar',
+  '/elonlar': "E'lonlar",
+  '/galereya': 'Galereya',
+  '/foydalanuvchilar': 'Foydalanuvchilar',
+  '/sorovlar': "So'rovlar",
+  '/chipta-tariflari': "Chipta ta'riflari",
+  '/sotilgan-chiptalar': 'Sotilgan chiptalar',
+  '/adminlar': 'Adminlar',
+  '/collaction': 'Kolleksiyalar',
+  '/collaction/add': "Kolleksiya qo'shish",
+};
+
+function getTitle(pathname) {
+  if (pathname.startsWith('/xodimlar/qoshish')) return "Xodim qo'shish";
+  if (pathname.startsWith('/xodimlar/tahrirlash')) return 'Xodimni tahrirlash';
+  if (pathname.startsWith('/collaction/add/')) return 'Kolleksiyani tahrirlash';
+  return pageTitles[pathname] || 'Bosh menyu';
+}
+
+export default function Header({ theme, onToggleTheme, onMenu }) {
   const { pathname } = useLocation();
-  const pageTitles = {
-    '/dashboard': 'Bosh Menyu',
-    '/xodimlar': 'Xodimlar',
-    '/kolleksiyalar': 'Kolleksiyalar',
-    '/yangiliklar': 'Yangiliklar',
-    '/elonlar': "E'lonlar",
-    '/galereya': 'Galereya',
-    '/foydalanuvchilar': 'Foydalanuvchilar',
-    '/sorovlar': "So'rovlar",
-    '/chipta-tariflari': "Chipta Ta'riflari",
-    '/sotilgan-chiptalar': 'Sotilgan Chiptalar',
-    '/adminlar': 'Adminlar',
-    '/collaction': 'Kolleksiyalar',
-    '/collaction/add': 'Kolleksiya qo‘shish',
-    '/collaction/edit': 'Kolleksiya tahrirlash'
-  };
+  const isDark = theme === 'dark';
+  const label = isDark ? 'Yorug‘ rejimga o‘tish' : 'Qorong‘i rejimga o‘tish';
 
   return (
     <header className="khiva-header">
       <div className="header-left">
-        <span className="header-page-title">{pageTitles[pathname] || 'Bosh Menyu'}</span>
+        <button className="icon-btn menu-toggle-btn" onClick={onMenu} aria-label="Menyuni ochish">
+          <Menu size={21} />
+        </button>
+        <h2 className="header-page-title">{getTitle(pathname)}</h2>
       </div>
-      
+
       <div className="header-right">
-        <Button 
-          type="text" 
-          icon={theme === 'dark' ? <MoonOutlined style={{ color: '#f59e0b', fontSize: '18px' }} /> : <SunOutlined style={{ color: '#f59e0b', fontSize: '18px' }} />} 
-          onClick={onToggleTheme}
-          aria-label={theme === 'dark' ? 'Yorug‘ rejimga o‘tish' : 'Qorong‘i rejimga o‘tish'}
-          title={theme === 'dark' ? 'Yorug‘ rejimga o‘tish' : 'Qorong‘i rejimga o‘tish'}
-          className="theme-toggle-btn"
-        />
+        <button className="icon-btn" onClick={onToggleTheme} aria-label={label} title={label}>
+          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
       </div>
     </header>
   );

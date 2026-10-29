@@ -1,35 +1,72 @@
 .khiva-header {
-  height: 70px;
-  background: var(--surface-bg);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 68px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 24px;
-  color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+  justify-content: space-between;
+  padding: 0 28px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .header-page-title {
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--text-primary);
-  letter-spacing: 0.3px;
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.2;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-right {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
-/* Ant Design button hover effektlarini to'g'rilash */
-.menu-toggle-btn:hover,
-.theme-toggle-btn:hover {
-  background-color: rgba(245, 158, 11, 0.1) !important;
-  border-radius: 8px !important;
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--teal);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+
+
+.menu-toggle-btn {
+  display: none;
+  color: var(--text);
+}
+
+@media (max-width: 1023px) {
+  .menu-toggle-btn {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 640px) {
+  .khiva-header {
+    padding: 0 14px;
+  }
+
+  .header-page-title {
+    font-size: 21px;
+  }
 }

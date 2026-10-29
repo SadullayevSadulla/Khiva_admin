@@ -1,93 +1,30 @@
-
-.xodimlar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.xodimlar-title {
-  color: #fff;
-  margin: 0;
-}
-pointer
-.add-xodim-btn {
-  background: #d37934;
-  border-color: #d37934;
-  font-weight: 600;
-}
-
-.add-xodim-btn:hover {
-  background: #d37934!important;
-  border-color: #d37934 !important;
+.xodim-avatar,
+.xodim-avatar-placeholder {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid var(--sand);
 }
 
 .xodim-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   object-fit: cover;
-  border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 .xodim-avatar-placeholder {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #1f2937;
-  color: #f59e0b;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+  background: var(--teal-soft);
+  color: var(--teal);
   font-size: 16px;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-weight: 700;
 }
 
-
-.ant-table {
-  background: #181b22 !important;
-  color: #ffffff !important;
-  border-radius: 10px !important;
-  border: 1px solid #b45309 !important; 
-  overflow: hidden;
+.xodim-name {
+  font-weight: 600;
 }
 
-.ant-table-thead > tr > th {
-  background: #d37934 !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  border-bottom: 1px solid #d37934 !important;
-}
-
-.ant-table-tbody > tr > td {
-  background: rgb(29, 28, 28) !important;
-  color: #ffffff !important;
-  border-bottom: 1px solid #b45309 !important;
-}
-
-.edit-btn-link {
-  color: #f59e0b !important;
-  border: 1px solid #f59e0b !important;
-  border-radius: 6px !important;
-  padding: 4px 12px !important;
-  background: transparent !important;
-}
-
-.edit-btn-link:hover {
-  background: rgba(245, 158, 11, 0.1) !important;
-}
-
-/* O'chirish tugmasi */
-.delete-btn-link {
-  color: #ef4444 !important;
-  border: 1px solid #ef4444 !important;
-  border-radius: 6px !important;
-  padding: 4px 12px !important;
-  background: transparent !important;
-}
-
-.delete-btn-link:hover {
-  background: rgba(239, 68, 68, 0.1) !important;
+.row-actions {
+  display: flex;
+  gap: 8px;
 }

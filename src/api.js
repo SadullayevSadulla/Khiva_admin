@@ -18,4 +18,13 @@ api.interceptors.request.use((config) => {
     return Promise.reject(error);
 });
 
+// Server qaytargan rasm yo'lini to'liq manzilga aylantiradi
+export const API_URL = import.meta.env.VITE_API_URL || 'https://api.atr.uz';
+
+export const fileUrl = (path) => {
+    if (!path || path === 'string') return '';
+    if (/^https?:\/\//.test(path)) return path;
+    return `${API_URL.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
 export default api;

@@ -133,7 +133,7 @@ export default function AddEmployee() {
         <ArrowLeftOutlined /> Chiqish
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+         <div className="form-card">
         <form onSubmit={handleSubmit}>
           <div className="form-grid-3">
             <div className="input-group">

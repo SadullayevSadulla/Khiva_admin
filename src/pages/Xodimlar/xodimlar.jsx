@@ -1,8 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Space, Button, message } from 'antd';
+import { Table, Popconfirm, message } from 'antd';
+import { Plus, SquarePen, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api';
+import api, { fileUrl } from '../../api';
 import './xodimlar.css';
+
+function Avatar({ record }) {
+  const [failed, setFailed] = useState(false);
+  const imageUrl = fileUrl(record.images?.[0]?.url);
+
+  if (imageUrl && !failed) {
+    return (
+      <img
+        src={imageUrl}
+        alt={record.fullName || 'xodim'}
+        className="xodim-avatar"
+        onError={() => setFailed(true)}
+      />
+    );
+  }
+
+  const initial = record.fullName ? record.fullName.charAt(0).toUpperCase() : 'X';
+  return <div className="xodim-avatar-placeholder">{initial}</div>;
+}
 
 export default function Xodimlar() {
   const [employees, setEmployees] = useState([]);
@@ -32,61 +52,31 @@ export default function Xodimlar() {
       message.success('Xodim muvaffaqiyatli o‘chirildi!');
       fetchEmployees();
     } catch (err) {
+      console.error(err);
       message.error('O‘chirishda xatolik yuz berdi!');
     }
   };
 
   const columns = [
     {
-      title: 'RASM',
+      title: 'Rasm',
       key: 'image',
-      render: (_, record) => {
-        const imagePath = record.images?.[0]?.url;
-
-        let imageUrl = '';
-        if (imagePath && imagePath !== 'string') {
-          if (imagePath.startsWith('http')) {
-            imageUrl = imagePath;
-          } else {
-            const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
-            imageUrl = `https://api.atr.uz${cleanPath}`;
-          }
-        }
-
-        if (imageUrl) {
-          return (
-            <img 
-              src={imageUrl} 
-              alt="xodim" 
-              className="xodim-avatar" 
-              onError={(e) => {
-                e.target.style.display = 'none';
-                if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
-              }}
-            />
-          );
-        }
-
-        const initial = record.fullName ? record.fullName.charAt(0).toUpperCase() : 'X';
-        return (
-          <div className="xodim-avatar-placeholder">
-            {initial}
-          </div>
-        );
-      },
+      width: 80,
+      render: (_, record) => <Avatar record={record} />,
     },
     {
-      title: 'Ism va Familya',
+      title: 'Ism va familiya',
       dataIndex: 'fullName',
       key: 'fullName',
+      render: (value) => <span className="xodim-name">{value}</span>,
     },
     {
-      title: 'TUG\'ILGAN KUNI',
+      title: "Tug'ilgan kuni",
       dataIndex: 'birthDate',
       key: 'birthDate',
     },
     {
-      title: 'LAVOZIMI',
+      title: 'Lavozimi',
       key: 'position',
       render: (_, record) => {
         if (typeof record.position === 'object' && record.position !== null) {
@@ -96,51 +86,44 @@ export default function Xodimlar() {
       },
     },
     {
-      title: 'AMALLAR',
+      title: 'Amallar',
       key: 'action',
+      width: 250,
       render: (_, record) => (
-        <Space size="middle">
-          <Button 
-            type="link" 
-            className="edit-btn-link" 
+        <div className="row-actions">
+          <button
+            className="btn btn-ghost btn-sm"
             onClick={() => navigate(`/xodimlar/tahrirlash/${record.id}`)}
           >
-            Tahrirlash
-          </Button>
-          
-          <Button 
-            type="link" 
-            danger 
-            className="delete-btn-link"
-            onClick={() => handleDelete(record.id)}
-          >
-            O'chirish
-          </Button>
-        </Space>
+            <SquarePen size={15} /> Tahrirlash
+          </button>
+          <button className="btn btn-danger btn-sm">
+            <Trash2 size={15} /> O'chirish
+          </button>
+        </div>
       ),
     },
   ];
 
   return (
-    <div className="xodimlar-container">
-      <div className="xodimlar-header">
-        <h2 className="xodimlar-title"></h2>
-        
-        <Button 
-          type="primary" 
-          className="add-xodim-btn"
-          onClick={() => navigate('/xodimlar/qoshish')}
-        >
-          + Xodim qo'shish
-        </Button>
+    <div>
+      <div className="page-bar">
+        <p className="page-bar-info">Jami: {employees.length} ta xodim</p>
+        <button className="btn btn-primary" onClick={() => navigate('/xodimlar/qoshish')}>
+          <Plus size={18} /> Xodim qo'shish
+        </button>
       </div>
 
-      <Table 
-        dataSource={employees} 
-        columns={columns} 
-        rowKey="id" 
-        loading={loading} 
-      />
+      <div className="panel table-panel">
+        <Table
+          dataSource={employees}
+          columns={columns}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: 760 }}
+          locale={{ emptyText: "Hozircha xodimlar yo'q" }}
+        />
+      </div>
     </div>
   );
 }
