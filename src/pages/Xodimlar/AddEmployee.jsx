@@ -9,7 +9,7 @@ export default function AddEmployee() {
   const navigate = useNavigate();
   const [lang, setLang] = useState('uz');
   const [loading, setLoading] = useState(false);
-  
+
   const [imageUrl, setImageUrl] = useState('');
   const [imagePreview, setImagePreview] = useState('');
   const [imgUploading, setImgUploading] = useState(false);
@@ -57,16 +57,14 @@ export default function AddEmployee() {
       const res = await api.post('/api/admin/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      
-      console.log("Serverdan rasm javobi keldi:", res.data); 
 
       let uploadedUrl = '';
       if (res.data?.files && res.data.files.length > 0) {
-        uploadedUrl = res.data.files[0].url; 
+        uploadedUrl = res.data.files[0].url;
       } else {
         uploadedUrl = res.data?.url || res.data?.data?.url || '';
       }
-      
+
       if (uploadedUrl) {
         setImageUrl(uploadedUrl);
         message.success("Rasm serverga muvaffaqiyatli yuklandi!");
@@ -130,10 +128,10 @@ export default function AddEmployee() {
   return (
     <div className="add-employee-page">
       <div className="back-btn" onClick={() => navigate('/xodimlar')}>
-        <ArrowLeftOutlined /> Chiqish
+        <ArrowLeftOutlined /> Qaytish
       </div>
 
-         <div className="form-card">
+      <div className="form-card">
         <form onSubmit={handleSubmit}>
           <div className="form-grid-3">
             <div className="input-group">
@@ -205,18 +203,18 @@ export default function AddEmployee() {
               <input type="file" accept="image/png, image/jpeg, image/webp" onChange={handleImageChange} hidden disabled={imgUploading} />
               {imagePreview ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%', paddingLeft: '10px' }}>
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #4b5563', opacity: imgUploading ? 0.5 : 1 }} 
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)', opacity: imgUploading ? 0.5 : 1 }}
                   />
-                  <span style={{ color: imgUploading ? '#f59e0b' : (imageUrl ? '#22c55e' : '#ef4444'), fontWeight: 500, fontSize: '14px' }}>
+                  <span style={{ color: imgUploading ? 'var(--teal)' : (imageUrl ? 'var(--ok)' : 'var(--danger)'), fontWeight: 500, fontSize: '14px' }}>
                     {imgUploading ? 'Rasm serverga yuklanmoqda, kuting...' : (imageUrl ? 'Rasm serverga yuklandi!' : 'Yuklashda xato, rasmni qayta tanlang')}
                   </span>
                 </div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <UploadOutlined style={{ fontSize: '20px', color: '#f59e0b' }} />
+                  <UploadOutlined style={{ fontSize: '20px', color: 'var(--teal)' }} />
                   <span className="upload-title">Rasm tanlang</span>
                 </div>
               )}

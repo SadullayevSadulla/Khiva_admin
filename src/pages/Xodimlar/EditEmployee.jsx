@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { message } from 'antd';
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
-import api from '../../api';
+import api, { fileUrl } from '../../api';
 import './add-employee.css';
 import Loader from '../../components/Loader/loader';
 
@@ -57,7 +57,7 @@ export default function EditEmployee() {
         const existingImg = data.images?.[0]?.url || data.image || '';
         if (existingImg) {
           setImageUrl(existingImg);
-          setImagePreview(existingImg.startsWith('http') ? existingImg : `https://api.atr.uz${existingImg.startsWith('/') ? '' : '/'}${existingImg}`);
+          setImagePreview(fileUrl(existingImg));
         }
       } catch (err) {
         console.error("Xodim ma'lumotlarini yuklashda xato:", err);
@@ -177,10 +177,10 @@ export default function EditEmployee() {
   return (
     <div className="add-employee-page">
       <div className="back-btn" onClick={() => navigate('/xodimlar')}>
-        <ArrowLeftOutlined /> Chiqish
+        <ArrowLeftOutlined /> Qaytish
       </div>
 
-         <div className="form-card">
+      <div className="form-card">
         <form onSubmit={handleSubmit}>
           <div className="form-grid-3">
             <div className="input-group">
@@ -255,15 +255,15 @@ export default function EditEmployee() {
                   <img
                     src={imagePreview}
                     alt="Preview"
-                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #4b5563', opacity: imgUploading ? 0.5 : 1 }}
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)', opacity: imgUploading ? 0.5 : 1 }}
                   />
-                  <span style={{ color: imgUploading ? '#f59e0b' : (imageUrl ? '#22c55e' : '#ef4444'), fontWeight: 500, fontSize: '14px' }}>
+                  <span style={{ color: imgUploading ? 'var(--teal)' : (imageUrl ? 'var(--ok)' : 'var(--danger)'), fontWeight: 500, fontSize: '14px' }}>
                     {imgUploading ? 'Yangi rasm serverga yuklanmoqda, kuting...' : (imageUrl ? 'Rasm yuklangan (Almashtirish uchun bosing)' : 'Yuklashda xato, rasmni qayta tanlang')}
                   </span>
                 </div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <UploadOutlined style={{ fontSize: '20px', color: '#f59e0b' }} />
+                  <UploadOutlined style={{ fontSize: '20px', color: 'var(--teal)' }} />
                   <span className="upload-title">Yangi rasm tanlash</span>
                 </div>
               )}
@@ -272,7 +272,7 @@ export default function EditEmployee() {
 
           <div className="form-footer">
             <button type="submit" className="save-btn" disabled={loading || imgUploading}>
-              <SaveOutlined /> {loading ? 'Saqlanmoqda...' : 'O\'zgarishlarni Saqlash'}
+              <SaveOutlined /> {loading ? 'Saqlanmoqda...' : 'O\'zgarishlarni saqlash'}
             </button>
           </div>
 

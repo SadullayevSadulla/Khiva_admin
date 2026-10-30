@@ -50,13 +50,13 @@ export default function TextEditor({ value = "", onChange }) {
       <div
         style={{
           display: "flex", flexWrap: "wrap", alignItems: "center", gap: 4,
-          padding: "8px 12px", borderBottom: "1px solid #4b5563",
+          padding: "8px 12px", borderBottom: "1px solid var(--line)", background: "var(--surface-2)",
         }}
       >
         {GROUPS.map((group, gi) => (
           <React.Fragment key={gi}>
             {gi > 0 && (
-              <span style={{ width: 1, height: 22, background: "#4b5563", margin: "0 8px" }} />
+              <span style={{ width: 1, height: 22, background: "var(--line)", margin: "0 8px" }} />
             )}
             {group.map(({ icon: Icon, title, cmd, arg }) => (
               <button
@@ -68,9 +68,9 @@ export default function TextEditor({ value = "", onChange }) {
                 style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   width: 32, height: 32, borderRadius: 6, border: "none",
-                  background: "transparent", color: "inherit", cursor: "pointer",
+                  background: "transparent", color: "var(--text)", cursor: "pointer",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "var(--hover)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <Icon size={18} />
@@ -84,7 +84,7 @@ export default function TextEditor({ value = "", onChange }) {
         contentEditable
         suppressContentEditableWarning
         onInput={() => onChange?.(ref.current.innerHTML)}
-        style={{ minHeight: 180, padding: 12, outline: "none", color: "inherit" }}
+        style={{ minHeight: 180, padding: 14, outline: "none", color: "var(--text)", lineHeight: 1.6 }}
       />
     </div>
   );

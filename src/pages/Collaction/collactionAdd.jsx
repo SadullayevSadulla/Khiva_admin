@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeftOutlined, UploadOutlined, SaveOutlined } from "@ant-design/icons";
+import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { message } from "antd";
 import TextEditor from "../../components/TextEditor";
-import api from "../../api";
+import api, { fileUrl } from "../../api";
 
-import '../Xodimlar/add-employee.css'; 
+import '../Xodimlar/add-employee.css';
 import Loader from "../../components/Loader/loader";
 
 export default function CollactionAdd() {
@@ -21,7 +21,7 @@ export default function CollactionAdd() {
   const [imgUrl, setImgUrl] = useState("");
   const [imagePreview, setImagePreview] = useState("");
   const [imgUploading, setImgUploading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [pageLoading, setPageLoading] = useState(isEdit);
 
   const { register, handleSubmit, reset, control } = useForm({
@@ -38,7 +38,7 @@ export default function CollactionAdd() {
         try {
           const res = await api.get(`/api/admin/collection/${cid}`);
           const item = res.data?.data || res.data;
-          
+
           if (item) {
             reset({
               title: {
@@ -61,7 +61,7 @@ export default function CollactionAdd() {
             const currentImg = item.images?.[0]?.url || "";
             if (currentImg) {
               setImgUrl(currentImg);
-              setImagePreview(currentImg.startsWith('http') ? currentImg : `https://api.atr.uz${currentImg.startsWith('/') ? '' : '/'}${currentImg}`);
+              setImagePreview(fileUrl(currentImg));
             }
           }
         } catch (err) {
@@ -93,14 +93,14 @@ export default function CollactionAdd() {
       const res = await api.post('/api/admin/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      
+
       let uploadedUrl = '';
       if (res.data?.files && res.data.files.length > 0) {
         uploadedUrl = res.data.files[0].url;
       } else {
         uploadedUrl = res.data?.url || res.data?.data?.url || '';
       }
-      
+
       if (uploadedUrl) {
         setImgUrl(uploadedUrl);
         message.success("Rasm serverga yuklandi!");
@@ -156,7 +156,7 @@ export default function CollactionAdd() {
         await api.post('/api/admin/collection', payload);
         message.success("Kolleksiya yaratildi");
       }
-      navigate("/collaction"); 
+      navigate("/collaction");
     } catch (err) {
       console.error(err);
       message.error(err.response?.data?.message || err.response?.data?.error || "Xatolik yuz berdi!");
@@ -175,9 +175,9 @@ export default function CollactionAdd() {
 
       <div className="form-card">
         <form onSubmit={handleSubmit(onSubmit)}>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            
+
             <div className="input-group">
               <div className="label-with-langs">
                 <label>Kolleksiya nomi</label>
@@ -223,10 +223,10 @@ export default function CollactionAdd() {
                 {...register(`description.${activeLangD}`)}
               />
             </div>
-            
+
           </div>
 
-          <div className="input-group" style={{ marginBottom: '24px' }}>
+          <div className="input-group">
             <div className="label-with-langs">
               <label>Content (Maqola)</label>
               <div className="lang-switcher">
@@ -241,7 +241,7 @@ export default function CollactionAdd() {
                 ))}
               </div>
             </div>
-               <div className="editor-box">
+            <div className="editor-box">
               <Controller
                 name={`content.${activeLangC}`}
                 control={control}
@@ -261,23 +261,24 @@ export default function CollactionAdd() {
               <input type="file" accept="image/png, image/jpeg, image/webp" onChange={handleImageChange} hidden disabled={imgUploading} />
               {imagePreview ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%', paddingLeft: '10px' }}>
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #4b5563', opacity: imgUploading ? 0.5 : 1 }} 
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--line)', opacity: imgUploading ? 0.5 : 1 }}
                   />
-                  <span style={{ color: imgUploading ? '#f59e0b' : (imgUrl ? '#22c55e' : '#ef4444'), fontWeight: 500, fontSize: '14px' }}>
+                  <span style={{ color: imgUploading ? 'var(--teal)' : (imgUrl ? 'var(--ok)' : 'var(--danger)'), fontWeight: 500, fontSize: '14px' }}>
                     {imgUploading ? 'Rasm serverga yuklanmoqda...' : (imgUrl ? 'Rasm yuklangan (Almashtirish uchun bosing)' : 'Yuklashda xato, rasmni qayta tanlang')}
                   </span>
                 </div>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <UploadOutlined style={{ fontSize: '20px', color: '#f59e0b' }} />
+                  <UploadOutlined style={{ fontSize: '20px', color: 'var(--teal)' }} />
                   <span className="upload-title">Rasm tanlang</span>
                 </div>
               )}
             </label>
           </div>
+
           <div className="form-footer">
             <button type="submit" className="save-btn" disabled={isSubmitting || imgUploading}>
               <SaveOutlined /> {isSubmitting ? 'Saqlanmoqda...' : 'Saqlash'}
