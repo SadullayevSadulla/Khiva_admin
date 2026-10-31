@@ -14,9 +14,11 @@ import CollactionAdd from "./pages/Collaction/collactionAdd";
 import Soon from "./pages/Soon/soon";
 import News from "./pages/News/news";
 import NewsAdd from "./pages/News/newsAdd";
+import Elonlar from "./pages/Elonlar/elonlar";
+import ElonlarAdd from "./pages/Elonlar/elonlarAdd";
 
+// Hali tayyor bo'lmagan bo'limlar
 const soonPaths = [
-  "/elonlar",
   "/galereya",
   "/foydalanuvchilar",
   "/sorovlar",
@@ -25,6 +27,7 @@ const soonPaths = [
   "/adminlar",
 ];
 
+// Ant Design komponentlari uchun ranglar (index.css dagi ranglar bilan bir xil)
 const antPalette = {
   light: { primary: "#c4501a", teal: "#137a8e", surface: "#ffffff", line: "#d6e0dd", text: "#14282e" },
   dark: { primary: "#ee7b3e", teal: "#3bb0c4", surface: "#122328", line: "#24404a", text: "#ede8dc" },
@@ -101,6 +104,9 @@ function App() {
           <Route path="/news" element={<News />} />
           <Route path="/news/add" element={<NewsAdd />} />
           <Route path="/news/add/:id" element={<NewsAdd />} />
+          <Route path="/elonlar" element={<Elonlar />} />
+          <Route path="/elonlar/add" element={<ElonlarAdd />} />
+          <Route path="/elonlar/add/:id" element={<ElonlarAdd />} />
           {soonPaths.map((path) => (
             <Route key={path} path={path} element={<Soon />} />
           ))}

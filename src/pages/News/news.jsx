@@ -7,7 +7,6 @@ import api, { fileUrl } from "../../api";
 import './news.css';
 import Loader from "../../components/Loader/loader";
 
-// HTML teglarni olib tashlab, oddiy matn qaytaradi
 const stripHtml = (html = "") => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 
 export default function News() {

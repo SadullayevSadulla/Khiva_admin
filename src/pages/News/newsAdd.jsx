@@ -18,20 +18,37 @@ const mapNews = (item) => {
   return {
     values: {
       title: pick("title"),
-      description: pick("description"), // Agar qisqa tavsif bo'lsa
+      description: pick("description"),
       content: pick("content"),
     },
     image: item?.images?.[0]?.url || "",
   };
 };
 
+// Serverdan kelgan xatoni o'qiladigan matnga aylantiradi
+const getErrorText = (err) => {
+  const res = err.response;
+  if (!res) {
+    return "Serverga ulanib bo'lmadi (tarmoq yoki CORS xatosi).";
+  }
+  const data = res.data;
+  const raw = data?.message ?? data?.error ?? data?.errors ?? data;
+  let text = "";
+  if (typeof raw === "string") text = raw;
+  else if (Array.isArray(raw)) {
+    text = raw.map((x) => (typeof x === "string" ? x : x?.message || JSON.stringify(x))).join("; ");
+  } else if (raw && typeof raw === "object") {
+    text = Object.values(raw).flat().map((x) => (typeof x === "string" ? x : JSON.stringify(x))).join("; ");
+  }
+  return `${res.status}: ${text || "Xatolik yuz berdi!"}`;
+};
+
 export default function NewsAdd() {
   const navigate = useNavigate();
-  const { id } = useParams(); // URL dagi ID ni 'id' deb oldik
+  const { id } = useParams();
   const { state } = useLocation();
   const isEdit = Boolean(id);
 
-  // Ro'yxatdan kelgan yangilik: forma darhol to'la ochiladi
   const passed =
     isEdit && state?.newsItem && String(state.newsItem.id) === String(id)
       ? mapNews(state.newsItem)
@@ -88,10 +105,8 @@ export default function NewsAdd() {
       };
       loadNews();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isEdit, reset]);
 
-  // UZ tilida yozilganini bo'sh turgan RU va EN maydonlarga ko'chiradi
   const copyToAllLanguages = () => {
     const values = getValues();
     let copied = 0;
@@ -139,7 +154,7 @@ export default function NewsAdd() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      let uploadedUrl = res.data?.files?.[0]?.url || res.data?.url || res.data?.data?.url || '';
+      const uploadedUrl = res.data?.files?.[0]?.url || res.data?.url || res.data?.data?.url || '';
 
       if (uploadedUrl) {
         setImgUrl(uploadedUrl);
@@ -149,7 +164,8 @@ export default function NewsAdd() {
         setImgUrl("");
       }
     } catch (err) {
-      message.error("Rasm yuklashda tarmoq xatosi yuz berdi!");
+      console.error("Rasm yuklashda xato:", err.response?.status, err.response?.data);
+      message.error("Rasm yuklashda xato: " + getErrorText(err));
       setImgUrl("");
     } finally {
       setImgUploading(false);
@@ -160,9 +176,14 @@ export default function NewsAdd() {
     const langs = ["uz", "ru", "en"];
     const missing = (field) => langs.filter((l) => !values[field]?.[l]?.trim());
     const noTitle = missing("title");
+    const noDesc = missing("description");
 
     if (noTitle.length) {
       message.error(`Yangilik sarlavhasini kiriting: ${noTitle.join(", ").toUpperCase()}`);
+      return;
+    }
+    if (noDesc.length) {
+      message.error(`Qisqa tavsifni kiriting: ${noDesc.join(", ").toUpperCase()}`);
       return;
     }
     if (!imgUrl) {
@@ -194,8 +215,8 @@ export default function NewsAdd() {
       }
       navigate("/news");
     } catch (err) {
-      console.error(err);
-      message.error(err.response?.data?.message || err.response?.data?.error || "Xatolik yuz berdi!");
+      console.error("Server javobi:", err.response?.status, err.response?.data);
+      message.error(getErrorText(err), 8);
     } finally {
       setIsSubmitting(false);
     }
@@ -211,7 +232,6 @@ export default function NewsAdd() {
 
       <div className="form-card">
         <form onSubmit={handleSubmit(onSubmit)}>
-
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 

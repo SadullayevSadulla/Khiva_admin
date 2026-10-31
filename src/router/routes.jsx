@@ -1,6 +1,8 @@
 import Collaction from "../pages/Collaction/collaction";
 import CollactionAdd from "../pages/Collaction/collactionAdd";
 import Dashboard from "../pages/Dashboard/dashboard";
+import Elonlar from "../pages/Elonlar/elonlar";
+import ElonlarAdd from "../pages/Elonlar/elonlarAdd";
 import News from "../pages/News/news";
 import NewsAdd from "../pages/News/newsAdd";
 import Xodimlar from "../pages/Xodimlar/xodimlar";
@@ -35,5 +37,15 @@ export const router = [
         id:6,
         path:"/news/add",
         element:<NewsAdd/>
+    },
+    {
+        id:6,
+        path:"/elonlar",
+        element:<Elonlar/>
+    },
+    {
+        id:7,
+        path:"/elonlar/add",
+        element:<ElonlarAdd/>
     },
 ]
