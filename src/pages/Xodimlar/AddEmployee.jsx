@@ -141,7 +141,7 @@ export default function AddEmployee() {
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                placeholder="Namuna: Ibrohim"
+                placeholder="Namuna: Sadulla"
                 required
               />
             </div>
@@ -152,7 +152,7 @@ export default function AddEmployee() {
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                placeholder="Namuna: Xabibullayev"
+                placeholder="Namuna: Sadullayev"
                 required
               />
             </div>
@@ -163,7 +163,7 @@ export default function AddEmployee() {
                 name="middleName"
                 value={formData.middleName}
                 onChange={handleChange}
-                placeholder="Namuna: Mahmujon o'g'li"
+                placeholder="Namuna: Nazar o'gli"
               />
             </div>
           </div>

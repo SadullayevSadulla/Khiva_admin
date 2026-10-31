@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { Controller, useForm } from "react-hook-form";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { message } from "antd";
 import TextEditor from "../../components/TextEditor";
 import api, { fileUrl } from "../../api";
@@ -9,23 +9,46 @@ import api, { fileUrl } from "../../api";
 import '../Xodimlar/add-employee.css';
 import Loader from "../../components/Loader/loader";
 
+const LANGS = ["en", "ru", "uz"];
+
+// Serverdan kelgan kolleksiyani forma qiymatlariga o'tkazadi
+const mapCollection = (item) => {
+  const pick = (field) =>
+    LANGS.reduce((acc, l) => ({ ...acc, [l]: item?.[field]?.[l] || "" }), {});
+  return {
+    values: {
+      title: pick("title"),
+      description: pick("description"),
+      content: pick("content"),
+    },
+    image: item?.images?.[0]?.url || "",
+  };
+};
+
 export default function CollactionAdd() {
   const navigate = useNavigate();
   const { cid } = useParams();
+  const { state } = useLocation();
   const isEdit = Boolean(cid);
+
+  // Ro'yxatdan kelgan kolleksiya: forma darhol to'la ochiladi
+  const passed =
+    isEdit && state?.collection && String(state.collection.id) === String(cid)
+      ? mapCollection(state.collection)
+      : null;
 
   const [activeLangN, setActiveLangN] = useState("uz");
   const [activeLangD, setActiveLangD] = useState("uz");
   const [activeLangC, setActiveLangC] = useState("uz");
 
-  const [imgUrl, setImgUrl] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
+  const [imgUrl, setImgUrl] = useState(passed?.image || "");
+  const [imagePreview, setImagePreview] = useState(passed?.image ? fileUrl(passed.image) : "");
   const [imgUploading, setImgUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [pageLoading, setPageLoading] = useState(isEdit);
+  const [pageLoading, setPageLoading] = useState(isEdit && !passed);
 
-  const { register, handleSubmit, reset, control } = useForm({
-    defaultValues: {
+  const { register, handleSubmit, reset, getValues, control } = useForm({
+    defaultValues: passed?.values || {
       title: { en: "", ru: "", uz: "" },
       description: { en: "", ru: "", uz: "" },
       content: { en: "", ru: "", uz: "" },
@@ -37,36 +60,28 @@ export default function CollactionAdd() {
       const loadCollection = async () => {
         try {
           const res = await api.get(`/api/admin/collection/${cid}`);
-          const item = res.data?.data || res.data;
+          let item = res.data?.data || res.data;
+          if (Array.isArray(item)) item = item.find((x) => String(x.id) === String(cid));
 
           if (item) {
-            reset({
-              title: {
-                en: item.title?.en || "",
-                ru: item.title?.ru || "",
-                uz: item.title?.uz || "",
-              },
-              description: {
-                en: item.description?.en || "",
-                ru: item.description?.ru || "",
-                uz: item.description?.uz || "",
-              },
-              content: {
-                en: item.content?.en || "",
-                ru: item.content?.ru || "",
-                uz: item.content?.uz || "",
-              },
+            const mapped = mapCollection(item);
+            const current = getValues();
+            const merged = {};
+            ["title", "description", "content"].forEach((field) => {
+              merged[field] = {};
+              LANGS.forEach((l) => {
+                merged[field][l] = mapped.values[field][l] || current[field]?.[l] || "";
+              });
             });
-
-            const currentImg = item.images?.[0]?.url || "";
-            if (currentImg) {
-              setImgUrl(currentImg);
-              setImagePreview(fileUrl(currentImg));
+            reset(merged);
+            if (mapped.image) {
+              setImgUrl(mapped.image);
+              setImagePreview(fileUrl(mapped.image));
             }
           }
         } catch (err) {
           console.error(err);
-          message.error("Kolleksiya ma'lumotlarini yuklab bo'lmadi!");
+          if (!passed) message.error("Kolleksiya ma'lumotlarini yuklab bo'lmadi!");
         } finally {
           setPageLoading(false);
         }

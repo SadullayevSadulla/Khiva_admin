@@ -20,7 +20,7 @@ const MENU = [
   { to: '/dashboard', label: 'Bosh menyu', icon: Home },
   { to: '/xodimlar', label: 'Xodimlar', icon: Briefcase },
   { to: '/collaction', label: 'Kolleksiyalar', icon: Layers },
-  { to: '/yangiliklar', label: 'Yangiliklar', icon: Newspaper },
+  { to: '/news', label: 'Yangiliklar', icon: Newspaper },
   { to: '/elonlar', label: "E'lonlar", icon: Megaphone },
   { to: '/galereya', label: 'Galereya', icon: ImageIcon },
   { to: '/foydalanuvchilar', label: 'Foydalanuvchilar', icon: Users },

@@ -6,7 +6,8 @@ const pageTitles = {
   '/dashboard': 'Bosh menyu',
   '/xodimlar': 'Xodimlar',
   '/kolleksiyalar': 'Kolleksiyalar',
-  '/yangiliklar': 'Yangiliklar',
+  '/news': 'Yangiliklar',
+  '/news/add': "Yangilik qo'shish",
   '/elonlar': "E'lonlar",
   '/galereya': 'Galereya',
   '/foydalanuvchilar': 'Foydalanuvchilar',
@@ -22,6 +23,7 @@ function getTitle(pathname) {
   if (pathname.startsWith('/xodimlar/qoshish')) return "Xodim qo'shish";
   if (pathname.startsWith('/xodimlar/tahrirlash')) return 'Xodimni tahrirlash';
   if (pathname.startsWith('/collaction/add/')) return 'Kolleksiyani tahrirlash';
+  if (pathname.startsWith('/news/add/')) return 'Yangilikni tahrirlash';
   return pageTitles[pathname] || 'Bosh menyu';
 }
 

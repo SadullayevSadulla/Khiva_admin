@@ -97,7 +97,7 @@ export default function Collaction() {
 
                   <div className="collection-actions">
                     <button
-                      onClick={() => navigate(`/collaction/add/${item.id}`)}
+                      onClick={() => navigate(`/collaction/add/${item.id}`, { state: { collection: item } })}
                       className="btn btn-ghost btn-sm"
                     >
                       <SquarePen size={15} /> Tahrirlash
@@ -117,6 +117,23 @@ export default function Collaction() {
               </article>
             );
           })}
+        </div>
+      )}
+
+      {confirm && (
+        <div className="modal-overlay" onClick={() => setConfirm(false)}>
+          <div className="modal-content" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">O'chirishni tasdiqlang</h2>
+            <p className="modal-text">Kolleksiya butunlay o'chiriladi. Buni ortga qaytarib bo'lmaydi.</p>
+            <div className="modal-actions">
+              <button onClick={() => setConfirm(false)} className="btn btn-ghost">
+                Yo'q
+              </button>
+              <button onClick={handleDelete} disabled={deleteLoading} className="btn btn-primary">
+                {deleteLoading ? "O'chirilmoqda..." : "Ha, o'chirish"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

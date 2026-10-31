@@ -1,72 +1,109 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { message } from 'antd';
 import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import api, { fileUrl } from '../../api';
 import './add-employee.css';
 import Loader from '../../components/Loader/loader';
 
+const emptyForm = {
+  firstName: '',
+  lastName: '',
+  middleName: '',
+  birthDate: '',
+  position: { uz: '', ru: '', en: '' },
+};
+
+// Sanani <input type="date"> tushunadigan YYYY-MM-DD ko'rinishiga keltiradi
+const toDateInput = (value) => {
+  if (!value) return '';
+  const str = String(value);
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) return str.substring(0, 10);
+  const m = str.match(/^(\d{2})[./-](\d{2})[./-](\d{4})/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}` : '';
+};
+
+// Serverdan kelgan xodimni forma ko'rinishiga o'tkazadi
+const mapEmployee = (data) => {
+  let fName = data.firstName || '';
+  let lName = data.lastName || '';
+  let mName = data.middleName || '';
+
+  if (data.fullName && !data.firstName) {
+    const nameParts = data.fullName.trim().split(' ');
+    lName = nameParts[0] || '';
+    fName = nameParts[1] || '';
+    mName = nameParts.slice(2).join(' ') || '';
+  }
+
+  return {
+    form: {
+      firstName: fName,
+      lastName: lName,
+      middleName: mName,
+      birthDate: toDateInput(data.birthDate),
+      position: {
+        uz: data.position?.uz || (typeof data.position === 'string' ? data.position : ''),
+        ru: data.position?.ru || '',
+        en: data.position?.en || '',
+      },
+    },
+    image: data.images?.[0]?.url || data.image || '',
+  };
+};
+
 export default function EditEmployee() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state } = useLocation();
+
+  // Ro'yxatdan kelgan xodim ma'lumoti: forma darhol to'la ochiladi
+  const passed = state?.employee && String(state.employee.id) === String(id) ? mapEmployee(state.employee) : null;
+
   const [lang, setLang] = useState('uz');
   const [loading, setLoading] = useState(false);
 
-  const [imageUrl, setImageUrl] = useState('');
-  const [imagePreview, setImagePreview] = useState('');
+  const [imageUrl, setImageUrl] = useState(passed?.image || '');
+  const [imagePreview, setImagePreview] = useState(passed?.image ? fileUrl(passed.image) : '');
   const [imgUploading, setImgUploading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(!passed);
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    middleName: '',
-    birthDate: '',
-    position: { uz: '', ru: '', en: '' },
-  });
+  const [formData, setFormData] = useState(passed?.form || emptyForm);
 
   useEffect(() => {
     const fetchEmployeeData = async () => {
       try {
         const response = await api.get(`/api/admin/employee/${id}`);
-        const data = response.data.data || response.data;
+        let data = response.data?.data || response.data;
+        if (Array.isArray(data)) data = data.find((item) => String(item.id) === String(id));
+        if (!data) return;
 
-        let fName = data.firstName || '';
-        let lName = data.lastName || '';
-        let mName = data.middleName || '';
-
-        if (data.fullName && !data.firstName) {
-          const nameParts = data.fullName.trim().split(' ');
-          lName = nameParts[0] || '';
-          fName = nameParts[1] || '';
-          mName = nameParts.slice(2).join(' ') || '';
-        }
-
-        setFormData({
-          firstName: fName,
-          lastName: lName,
-          middleName: mName,
-          birthDate: data.birthDate ? data.birthDate.substring(0, 10) : '',
+        const mapped = mapEmployee(data);
+        // Serverdan bo'sh kelgan maydon ro'yxatdagi qiymatni o'chirib yubormasin
+        setFormData((prev) => ({
+          firstName: mapped.form.firstName || prev.firstName,
+          lastName: mapped.form.lastName || prev.lastName,
+          middleName: mapped.form.middleName || prev.middleName,
+          birthDate: mapped.form.birthDate || prev.birthDate,
           position: {
-            uz: data.position?.uz || (typeof data.position === 'string' ? data.position : ''),
-            ru: data.position?.ru || '',
-            en: data.position?.en || '',
+            uz: mapped.form.position.uz || prev.position.uz,
+            ru: mapped.form.position.ru || prev.position.ru,
+            en: mapped.form.position.en || prev.position.en,
           },
-        });
-
-        const existingImg = data.images?.[0]?.url || data.image || '';
-        if (existingImg) {
-          setImageUrl(existingImg);
-          setImagePreview(fileUrl(existingImg));
+        }));
+        if (mapped.image) {
+          setImageUrl(mapped.image);
+          setImagePreview(fileUrl(mapped.image));
         }
       } catch (err) {
         console.error("Xodim ma'lumotlarini yuklashda xato:", err);
-        message.error("Xodim ma'lumotlarini yuklab bo'lmadi!");
+        if (!passed) message.error("Xodim ma'lumotlarini yuklab bo'lmadi!");
       } finally {
         setPageLoading(false);
       }
     };
     fetchEmployeeData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleChange = (e) => {
