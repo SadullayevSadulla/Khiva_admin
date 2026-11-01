@@ -16,18 +16,17 @@ import News from "./pages/News/news";
 import NewsAdd from "./pages/News/newsAdd";
 import Elonlar from "./pages/Elonlar/elonlar";
 import ElonlarAdd from "./pages/Elonlar/elonlarAdd";
+import Gallery from "./pages/Gallery/gallery";
+import GalleryAdd from "./pages/Gallery/galleryAdd";
+import Users from "./pages/Users/userrs";
 
-// Hali tayyor bo'lmagan bo'limlar
 const soonPaths = [
-  "/galereya",
-  "/foydalanuvchilar",
   "/sorovlar",
   "/chipta-tariflari",
   "/sotilgan-chiptalar",
   "/adminlar",
 ];
 
-// Ant Design komponentlari uchun ranglar (index.css dagi ranglar bilan bir xil)
 const antPalette = {
   light: { primary: "#c4501a", teal: "#137a8e", surface: "#ffffff", line: "#d6e0dd", text: "#14282e" },
   dark: { primary: "#ee7b3e", teal: "#3bb0c4", surface: "#122328", line: "#24404a", text: "#ede8dc" },
@@ -37,7 +36,6 @@ function AdminLayout({ theme, onToggleTheme }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
 
-  // Sahifa almashganda mobil menyu yopiladi
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
@@ -107,6 +105,9 @@ function App() {
           <Route path="/elonlar" element={<Elonlar />} />
           <Route path="/elonlar/add" element={<ElonlarAdd />} />
           <Route path="/elonlar/add/:id" element={<ElonlarAdd />} />
+          <Route path="/galereya" element={<Gallery />} />
+          <Route path="/galereya/add" element={<GalleryAdd />} />
+          <Route path="/foydalanuvchilar" element={<Users />} />
           {soonPaths.map((path) => (
             <Route key={path} path={path} element={<Soon />} />
           ))}

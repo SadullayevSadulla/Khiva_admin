@@ -9,7 +9,9 @@ const pageTitles = {
   '/news': 'Yangiliklar',
   '/news/add': "Yangilik qo'shish",
   '/elonlar': "E'lonlar",
+  '/elonlar/add': "E'lon qo'shish",
   '/galereya': 'Galereya',
+  '/galereya/add': "Rasm qo'shish",
   '/foydalanuvchilar': 'Foydalanuvchilar',
   '/sorovlar': "So'rovlar",
   '/chipta-tariflari': "Chipta ta'riflari",
@@ -24,6 +26,7 @@ function getTitle(pathname) {
   if (pathname.startsWith('/xodimlar/tahrirlash')) return 'Xodimni tahrirlash';
   if (pathname.startsWith('/collaction/add/')) return 'Kolleksiyani tahrirlash';
   if (pathname.startsWith('/news/add/')) return 'Yangilikni tahrirlash';
+  if (pathname.startsWith('/elonlar/add/')) return "E'lonni tahrirlash";
   return pageTitles[pathname] || 'Bosh menyu';
 }
 
