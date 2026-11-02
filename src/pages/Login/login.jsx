@@ -30,7 +30,7 @@ export default function Login() {
 
     try {
       // Axios orqali so'rov yuborish
-      const response = await api.post('/api/login', {
+      const response = await api.post('/api/admin/login', {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });

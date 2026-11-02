@@ -1,3 +1,4 @@
+import Admins from "../pages/admins/admins";
 import Collaction from "../pages/Collaction/collaction";
 import CollactionAdd from "../pages/Collaction/collactionAdd";
 import Dashboard from "../pages/Dashboard/dashboard";
@@ -60,4 +61,9 @@ export const router = [
         path:"/gallery/add",
         element:<GalleryAdd/>
     },
+    {
+        id:10,
+        path:"adminlar",
+        element:<Admins/>
+    }
 ]

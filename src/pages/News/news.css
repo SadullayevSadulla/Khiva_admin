@@ -14,10 +14,8 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--surface);
-  border: 1px solid var(--line);
   border-radius: 14px;
   box-shadow: var(--shadow);
-  transition: border-color 0.15s;
 }
 
 

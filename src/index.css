@@ -262,10 +262,3 @@ h1,h2,h3 {
   border: 2px solid var(--bg);
   border-radius: 10px;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
-}

@@ -19,12 +19,13 @@ import ElonlarAdd from "./pages/Elonlar/elonlarAdd";
 import Gallery from "./pages/Gallery/gallery";
 import GalleryAdd from "./pages/Gallery/galleryAdd";
 import Users from "./pages/Users/userrs";
+import Admins from "./pages/admins/admins";
+import AdminAdd from "./pages/admins/adminAdd";
 
 const soonPaths = [
   "/sorovlar",
   "/chipta-tariflari",
   "/sotilgan-chiptalar",
-  "/adminlar",
 ];
 
 const antPalette = {
@@ -108,6 +109,8 @@ function App() {
           <Route path="/galereya" element={<Gallery />} />
           <Route path="/galereya/add" element={<GalleryAdd />} />
           <Route path="/foydalanuvchilar" element={<Users />} />
+          <Route path="/adminlar" element={<Admins />} />
+          <Route path="/adminlar/add" element={<AdminAdd />} />
           {soonPaths.map((path) => (
             <Route key={path} path={path} element={<Soon />} />
           ))}

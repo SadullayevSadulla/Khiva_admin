@@ -6,6 +6,49 @@ import "./users.css";
 
 const SENSITIVE = /pass|token|secret|hash|salt/i;
 
+const LIST_KEYS = ["data", "users", "items", "rows", "results", "list", "docs", "content"];
+
+const extractList = (body, depth = 0) => {
+  if (Array.isArray(body)) return body;
+  if (!body || typeof body !== "object" || depth > 2) return null;
+  for (const key of LIST_KEYS) {
+    if (key in body) {
+      const found = extractList(body[key], depth + 1);
+      if (found) return found;
+    }
+  }
+  for (const value of Object.values(body)) {
+    if (Array.isArray(value)) return value;
+  }
+  return null;
+};
+
+const extractTotal = (body) => {
+  const candidates = [
+    body?.total,
+    body?.count,
+    body?.totalItems,
+    body?.meta?.total,
+    body?.pagination?.total,
+    body?.data?.total,
+    body?.data?.count,
+    body?.data?.meta?.total,
+  ];
+  const found = candidates.find((v) => Number.isFinite(Number(v)) && Number(v) > 0);
+  return found ? Number(found) : null;
+};
+
+const getErrorText = (err) => {
+  const res = err.response;
+  if (!res) return "Serverga ulanib bo'lmadi (tarmoq yoki CORS xatosi).";
+  const raw = res.data?.message ?? res.data?.error ?? res.data?.errors ?? res.data;
+  let text = "";
+  if (typeof raw === "string") text = raw;
+  else if (Array.isArray(raw)) text = raw.map((x) => (typeof x === "string" ? x : x?.message || JSON.stringify(x))).join("; ");
+  else if (raw && typeof raw === "object") text = JSON.stringify(raw);
+  return `${res.status}: ${text || "Xatolik yuz berdi!"}`;
+};
+
 const getName = (u) =>
   u.fullName ||
   [u.firstName, u.lastName].filter(Boolean).join(" ") ||
@@ -68,6 +111,8 @@ function UserAvatar({ user }) {
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [total, setTotal] = useState(null);
+  const [note, setNote] = useState("");
 
   const [selected, setSelected] = useState(null);
   const [detail, setDetail] = useState(null);
@@ -75,13 +120,38 @@ export default function Users() {
 
   const fetchUsers = async () => {
     setLoading(true);
+    setNote("");
     try {
       const res = await api.get("/api/admin/user");
-      const data = res.data?.data || res.data || [];
-      setUsers(Array.isArray(data) ? data : []);
+      let list = extractList(res.data);
+
+      if (!list) {
+        console.warn("Kutilmagan server javobi:", res.data);
+        setUsers([]);
+        setNote("Server javobida foydalanuvchilar ro'yxati topilmadi. F12 → Console da javobni ko'ring.");
+        return;
+      }
+
+      const serverTotal = extractTotal(res.data);
+
+      if (serverTotal && list.length < serverTotal) {
+        const all = [...list];
+        const firstId = list[0]?.id;
+        for (let page = 2; all.length < serverTotal && page <= 50; page += 1) {
+          const r = await api.get(`/api/admin/user?page=${page}`);
+          const chunk = extractList(r.data) || [];
+          if (chunk.length === 0 || chunk[0]?.id === firstId) break;
+          all.push(...chunk);
+        }
+        list = all;
+      }
+
+      setUsers(list);
+      setTotal(serverTotal);
     } catch (err) {
-      console.error(err);
-      message.error("Foydalanuvchilarni yuklashda xatolik yuz berdi!");
+      console.error("Foydalanuvchilar:", err.response?.status, err.response?.data);
+      setNote("Foydalanuvchilarni yuklab bo'lmadi: " + getErrorText(err));
+      message.error("Foydalanuvchilarni yuklab bo'lmadi: " + getErrorText(err), 8);
     } finally {
       setLoading(false);
     }
@@ -146,16 +216,6 @@ export default function Users() {
       key: "createdAt",
       render: (_, u) => formatDate(u.createdAt),
     },
-    {
-      title: "Amallar",
-      key: "action",
-      width: 140,
-      render: (_, user) => (
-        <button className="btn btn-ghost btn-sm" onClick={() => openDetail(user)}>
-          <Eye size={15} /> Ko'rish
-        </button>
-      ),
-    },
   ].filter(Boolean);
 
   const fields = detail
@@ -167,10 +227,12 @@ export default function Users() {
   return (
     <div>
       <div className="page-bar">
-        <p className="page-bar-info">Jami: {users.length} ta foydalanuvchi</p>
+        <p className="page-bar-info">Jami: {total || users.length} ta foydalanuvchi</p>
       </div>
 
-      <div className="panel table-panel">
+      {note && <p className="users-note">{note}</p>}
+
+      <div className="panel table-panel users-table-panel">
         <Table
           dataSource={users}
           columns={columns}
