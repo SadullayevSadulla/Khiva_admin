@@ -17,6 +17,7 @@ const pageTitles = {
   '/chipta-tariflari': "Chipta ta'riflari",
   '/sotilgan-chiptalar': 'Sotilgan chiptalar',
   '/adminlar': 'Adminlar',
+  '/adminlar/add': "Admin qo'shish",
   '/collaction': 'Kolleksiyalar',
   '/collaction/add': "Kolleksiya qo'shish",
 };
@@ -27,6 +28,7 @@ function getTitle(pathname) {
   if (pathname.startsWith('/collaction/add/')) return 'Kolleksiyani tahrirlash';
   if (pathname.startsWith('/news/add/')) return 'Yangilikni tahrirlash';
   if (pathname.startsWith('/elonlar/add/')) return "E'lonni tahrirlash";
+  if (pathname.startsWith('/adminlar/add/')) return 'Adminni tahrirlash';
   return pageTitles[pathname] || 'Bosh menyu';
 }
 

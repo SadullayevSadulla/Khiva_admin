@@ -18,9 +18,9 @@ import Elonlar from "./pages/Elonlar/elonlar";
 import ElonlarAdd from "./pages/Elonlar/elonlarAdd";
 import Gallery from "./pages/Gallery/gallery";
 import GalleryAdd from "./pages/Gallery/galleryAdd";
-import Users from "./pages/Users/userrs";
 import Admins from "./pages/admins/admins";
 import AdminAdd from "./pages/admins/adminAdd";
+import Users from "./pages/Users/userrs";
 
 const soonPaths = [
   "/sorovlar",
@@ -111,6 +111,7 @@ function App() {
           <Route path="/foydalanuvchilar" element={<Users />} />
           <Route path="/adminlar" element={<Admins />} />
           <Route path="/adminlar/add" element={<AdminAdd />} />
+          <Route path="/adminlar/add/:id" element={<AdminAdd />} />
           {soonPaths.map((path) => (
             <Route key={path} path={path} element={<Soon />} />
           ))}
