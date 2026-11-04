@@ -85,7 +85,7 @@ export default function News() {
           {newsList.map((item) => {
             const mainImg = item.images?.find((img) => img.mainImage)?.url || item.images?.[0]?.url;
             const image = fileUrl(mainImg);
-            const text = stripHtml(item.description?.uz) || stripHtml(item.content?.uz).substring(0, 140);
+            const text = stripHtml(item.content?.uz).substring(0, 140);
             return (
               <article key={item.id} className="news-card">
                 <div className="news-img-wrapper">
@@ -97,7 +97,7 @@ export default function News() {
                 </div>
                 <div className="news-content">
                   <h3 className="news-title">{item.title?.uz || 'Nomsiz'}</h3>
-                  <p className="news-desc">{text || "Tavsif yo'q"}</p>
+                  <p className="news-desc">{text || "Maqola matni yo'q"}</p>
 
                   <div className="news-actions">
                     <button

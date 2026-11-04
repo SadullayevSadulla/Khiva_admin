@@ -54,19 +54,3 @@
   display: none;
   color: var(--text);
 }
-
-@media (max-width: 1023px) {
-  .menu-toggle-btn {
-    display: inline-flex;
-  }
-}
-
-@media (max-width: 640px) {
-  .khiva-header {
-    padding: 0 14px;
-  }
-
-  .header-page-title {
-    font-size: 21px;
-  }
-}

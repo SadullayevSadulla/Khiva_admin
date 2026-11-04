@@ -23,7 +23,8 @@ export const API_URL = import.meta.env.VITE_API_URL || 'https://api.atr.uz';
 
 export const fileUrl = (path) => {
     if (!path || path === 'string') return '';
-    if (/^https?:\/\//.test(path)) return path;
+    if (/^(https?:|data:|blob:)/i.test(path)) return path;
+    if (path.startsWith('//')) return `${window.location.protocol}${path}`;
     return `${API_URL.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
 };
 

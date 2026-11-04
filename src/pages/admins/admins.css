@@ -115,10 +115,7 @@
   opacity: 0.7;
 }
 
-.admin-field input:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px var(--teal-soft);
-}
+
 
 .admin-password {
   position: relative;

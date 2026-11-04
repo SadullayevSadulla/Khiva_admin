@@ -13,13 +13,14 @@ const pageTitles = {
   '/galereya': 'Galereya',
   '/galereya/add': "Rasm qo'shish",
   '/foydalanuvchilar': 'Foydalanuvchilar',
-  '/sorovlar': "So'rovlar",
   '/chipta-tariflari': "Chipta ta'riflari",
   '/sotilgan-chiptalar': 'Sotilgan chiptalar',
   '/adminlar': 'Adminlar',
   '/adminlar/add': "Admin qo'shish",
   '/collaction': 'Kolleksiyalar',
   '/collaction/add': "Kolleksiya qo'shish",
+  '/profil': 'Profilim',
+  '/requests': "So'rovlar",
 };
 
 function getTitle(pathname) {

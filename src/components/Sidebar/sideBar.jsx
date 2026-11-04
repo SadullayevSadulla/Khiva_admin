@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { fetchProfile, getProfileName, getAvatarUrl } from '../../pages/Profile/profileApi.js';
 import './sideBar.css';
 import {
   Home,
@@ -24,7 +26,7 @@ const MENU = [
   { to: '/elonlar', label: "E'lonlar", icon: Megaphone },
   { to: '/galereya', label: 'Galereya', icon: ImageIcon },
   { to: '/foydalanuvchilar', label: 'Foydalanuvchilar', icon: Users },
-  { to: '/sorovlar', label: "So'rovlar", icon: Mail },
+  { to: '/requests', label: 'Sorovlar', icon:Mail  },
   { to: '/chipta-tariflari', label: "Chipta ta'riflari", icon: Ticket },
   { to: '/sotilgan-chiptalar', label: 'Sotilgan chiptalar', icon: CheckSquare },
   { to: '/adminlar', label: 'Adminlar', icon: UserCog },
@@ -32,6 +34,24 @@ const MENU = [
 
 const SideBar = ({ open = false, onClose }) => {
   const navigate = useNavigate();
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    const load = () =>
+      fetchProfile()
+        .then((data) => active && setProfile(data))
+        .catch(() => {});
+    load();
+    window.addEventListener('profile-updated', load);
+    return () => {
+      active = false;
+      window.removeEventListener('profile-updated', load);
+    };
+  }, []);
+
+  const profileName = profile ? getProfileName(profile) : 'Profil';
+  const avatarUrl = profile ? getAvatarUrl(profile) : '';
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -76,10 +96,12 @@ const SideBar = ({ open = false, onClose }) => {
         </nav>
 
         <div className="sidebar-footer">
-          <div className="user-profile">
-            <div className="avatar">SS</div>
-            <span className="user-name">Sadulla Sadullayev</span>
-          </div>
+          <NavLink to="/profil" onClick={onClose} className="user-profile" title="Profilim">
+            <div className="avatar">
+              {avatarUrl ? <img src={avatarUrl} alt="" /> : profileName.charAt(0).toUpperCase()}
+            </div>
+            <span className="user-name">{profileName}</span>
+          </NavLink>
           <button className="logout-btn" onClick={handleLogout}>
             <LogOut size={18} />
             <span>Chiqish</span>

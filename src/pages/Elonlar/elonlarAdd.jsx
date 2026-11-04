@@ -18,7 +18,6 @@ const mapElon = (item) => {
   return {
     values: {
       title: pick("title"),
-      description: pick("description"),
       content: pick("content"),
     },
     image: item?.images?.[0]?.url || "",
@@ -56,7 +55,6 @@ export default function ElonlarAdd() {
       : null;
 
   const [activeLangN, setActiveLangN] = useState("uz");
-  const [activeLangD, setActiveLangD] = useState("uz");
   const [activeLangC, setActiveLangC] = useState("uz");
 
   const [imgUrl, setImgUrl] = useState(passed?.image || "");
@@ -68,7 +66,6 @@ export default function ElonlarAdd() {
   const { register, handleSubmit, reset, getValues, setValue, control } = useForm({
     defaultValues: passed?.values || {
       title: { en: "", ru: "", uz: "" },
-      description: { en: "", ru: "", uz: "" },
       content: { en: "", ru: "", uz: "" },
     },
   });
@@ -85,7 +82,7 @@ export default function ElonlarAdd() {
             const mapped = mapElon(item);
             const current = getValues();
             const merged = {};
-            ["title", "description", "content"].forEach((field) => {
+            ["title", "content"].forEach((field) => {
               merged[field] = {};
               LANGS.forEach((l) => {
                 merged[field][l] = mapped.values[field][l] || current[field]?.[l] || "";
@@ -109,13 +106,12 @@ export default function ElonlarAdd() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isEdit, reset]);
 
-  // UZ tilida yozilganini bo'sh turgan RU va EN maydonlarga ko'chiradi
   const copyToAllLanguages = () => {
     const values = getValues();
     let copied = 0;
     let hasSource = false;
 
-    ["title", "description", "content"].forEach((field) => {
+    ["title", "content"].forEach((field) => {
       const source = values[field]?.uz || "";
       if (!source.replace(/<[^>]*>/g, "").trim()) return;
       hasSource = true;
@@ -130,7 +126,7 @@ export default function ElonlarAdd() {
     });
 
     if (!hasSource) {
-      message.warning("Avval UZ tilida sarlavha, tavsif yoki maqola yozing!");
+      message.warning("Avval UZ tilida sarlavha yoki maqola yozing!");
     } else if (copied === 0) {
       message.info("RU va EN maydonlari allaqachon to'ldirilgan.");
     } else {
@@ -176,17 +172,8 @@ export default function ElonlarAdd() {
   };
 
   const onSubmit = async (values) => {
-    const langs = ["uz", "ru", "en"];
-    const missing = (field) => langs.filter((l) => !values[field]?.[l]?.trim());
-    const noTitle = missing("title");
-    const noDesc = missing("description");
-
-    if (noTitle.length) {
-      message.error(`E'lon sarlavhasini kiriting: ${noTitle.join(", ").toUpperCase()}`);
-      return;
-    }
-    if (noDesc.length) {
-      message.error(`Qisqa tavsifni kiriting: ${noDesc.join(", ").toUpperCase()}`);
+    if (!values.title?.uz?.trim()) {
+      message.error("E'lon sarlavhasini kiriting!");
       return;
     }
     if (!imgUrl) {
@@ -196,7 +183,6 @@ export default function ElonlarAdd() {
 
     const payload = {
       title: values.title,
-      description: values.description,
       content: values.content,
       images: [
         {
@@ -258,29 +244,6 @@ export default function ElonlarAdd() {
                 type="text"
                 placeholder={`${activeLangN.toUpperCase()} tilida sarlavhani kiriting`}
                 {...register(`title.${activeLangN}`)}
-              />
-            </div>
-
-            <div className="input-group">
-              <div className="label-with-langs">
-                <label>Qisqa tavsif</label>
-                <div className="lang-switcher">
-                  {["uz", "ru", "en"].map((lang) => (
-                    <span
-                      key={lang}
-                      onClick={() => setActiveLangD(lang)}
-                      className={activeLangD === lang ? "active" : ""}
-                    >
-                      {lang}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <input
-                key={`desc-${activeLangD}`}
-                type="text"
-                placeholder={`${activeLangD.toUpperCase()} tilida tavsifni kiriting`}
-                {...register(`description.${activeLangD}`)}
               />
             </div>
 

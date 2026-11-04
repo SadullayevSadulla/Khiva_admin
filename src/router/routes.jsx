@@ -8,6 +8,7 @@ import Gallery from "../pages/Gallery/gallery";
 import GalleryAdd from "../pages/Gallery/galleryAdd";
 import News from "../pages/News/news";
 import NewsAdd from "../pages/News/newsAdd";
+import Requests from "../pages/requests/requests";
 import Xodimlar from "../pages/Xodimlar/xodimlar";
 
 export const router = [
@@ -63,7 +64,12 @@ export const router = [
     },
     {
         id:10,
-        path:"adminlar",
+        path:"/adminlar",
         element:<Admins/>
+    },
+    {
+        id:11,
+        path:"/requests",
+        element:<Requests/>
     }
 ]

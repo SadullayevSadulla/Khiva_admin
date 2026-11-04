@@ -21,9 +21,10 @@ import GalleryAdd from "./pages/Gallery/galleryAdd";
 import Admins from "./pages/admins/admins";
 import AdminAdd from "./pages/admins/adminAdd";
 import Users from "./pages/Users/userrs";
+import Profile from "./pages/Profile/profile";
+import Requests from "./pages/requests/requests.jsx";
 
 const soonPaths = [
-  "/sorovlar",
   "/chipta-tariflari",
   "/sotilgan-chiptalar",
 ];
@@ -112,6 +113,9 @@ function App() {
           <Route path="/adminlar" element={<Admins />} />
           <Route path="/adminlar/add" element={<AdminAdd />} />
           <Route path="/adminlar/add/:id" element={<AdminAdd />} />
+          <Route path="/profil" element={<Profile />} />
+          <Route path="/sorovlar" element={<Requests />} />
+          <Route path="/requests" element={<Requests />} />
           {soonPaths.map((path) => (
             <Route key={path} path={path} element={<Soon />} />
           ))}

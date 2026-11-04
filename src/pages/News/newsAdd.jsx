@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { UploadOutlined, SaveOutlined, ArrowLeftOutlined, CopyOutlined } from "@ant-design/icons";
+import { UploadOutlined, SaveOutlined, ArrowLeftOutlined } from "@ant-design/icons";
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { message } from "antd";
@@ -11,21 +11,18 @@ import Loader from "../../components/Loader/loader";
 
 const LANGS = ["en", "ru", "uz"];
 
-// Serverdan kelgan yangilikni forma qiymatlariga o'tkazadi
 const mapNews = (item) => {
   const pick = (field) =>
     LANGS.reduce((acc, l) => ({ ...acc, [l]: item?.[field]?.[l] || "" }), {});
   return {
     values: {
       title: pick("title"),
-      description: pick("description"),
       content: pick("content"),
     },
     image: item?.images?.[0]?.url || "",
   };
 };
 
-// Serverdan kelgan xatoni o'qiladigan matnga aylantiradi
 const getErrorText = (err) => {
   const res = err.response;
   if (!res) {
@@ -55,7 +52,6 @@ export default function NewsAdd() {
       : null;
 
   const [activeLangN, setActiveLangN] = useState("uz");
-  const [activeLangD, setActiveLangD] = useState("uz");
   const [activeLangC, setActiveLangC] = useState("uz");
 
   const [imgUrl, setImgUrl] = useState(passed?.image || "");
@@ -67,7 +63,6 @@ export default function NewsAdd() {
   const { register, handleSubmit, reset, getValues, setValue, control } = useForm({
     defaultValues: passed?.values || {
       title: { en: "", ru: "", uz: "" },
-      description: { en: "", ru: "", uz: "" },
       content: { en: "", ru: "", uz: "" },
     },
   });
@@ -84,7 +79,7 @@ export default function NewsAdd() {
             const mapped = mapNews(item);
             const current = getValues();
             const merged = {};
-            ["title", "description", "content"].forEach((field) => {
+            ["title", "content"].forEach((field) => {
               merged[field] = {};
               LANGS.forEach((l) => {
                 merged[field][l] = mapped.values[field][l] || current[field]?.[l] || "";
@@ -112,7 +107,7 @@ export default function NewsAdd() {
     let copied = 0;
     let hasSource = false;
 
-    ["title", "description", "content"].forEach((field) => {
+    ["title", "content"].forEach((field) => {
       const source = values[field]?.uz || "";
       if (!source.replace(/<[^>]*>/g, "").trim()) return;
       hasSource = true;
@@ -127,7 +122,7 @@ export default function NewsAdd() {
     });
 
     if (!hasSource) {
-      message.warning("Avval UZ tilida sarlavha, tavsif yoki maqola yozing!");
+      message.warning("Avval UZ tilida sarlavha yoki maqola yozing!");
     } else if (copied === 0) {
       message.info("RU va EN maydonlari allaqachon to'ldirilgan.");
     } else {
@@ -176,14 +171,8 @@ export default function NewsAdd() {
     const langs = ["uz", "ru", "en"];
     const missing = (field) => langs.filter((l) => !values[field]?.[l]?.trim());
     const noTitle = missing("title");
-    const noDesc = missing("description");
-
     if (noTitle.length) {
       message.error(`Yangilik sarlavhasini kiriting: ${noTitle.join(", ").toUpperCase()}`);
-      return;
-    }
-    if (noDesc.length) {
-      message.error(`Qisqa tavsifni kiriting: ${noDesc.join(", ").toUpperCase()}`);
       return;
     }
     if (!imgUrl) {
@@ -193,7 +182,6 @@ export default function NewsAdd() {
 
     const payload = {
       title: values.title,
-      description: values.description,
       content: values.content,
       images: [
         {
@@ -255,29 +243,6 @@ export default function NewsAdd() {
                 type="text"
                 placeholder={`${activeLangN.toUpperCase()} tilida sarlavhani kiriting`}
                 {...register(`title.${activeLangN}`)}
-              />
-            </div>
-
-            <div className="input-group">
-              <div className="label-with-langs">
-                <label>Qisqa tavsif</label>
-                <div className="lang-switcher">
-                  {["uz", "ru", "en"].map((lang) => (
-                    <span
-                      key={lang}
-                      onClick={() => setActiveLangD(lang)}
-                      className={activeLangD === lang ? "active" : ""}
-                    >
-                      {lang}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <input
-                key={`desc-${activeLangD}`}
-                type="text"
-                placeholder={`${activeLangD.toUpperCase()} tilida tavsifni kiriting`}
-                {...register(`description.${activeLangD}`)}
               />
             </div>
 
