@@ -145,9 +145,9 @@ export function uploadAvatar(file) {
   const form = new FormData();
   form.append('file', file);
 
-  return api.put('/api/profile/avatar', form, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  // Let the browser set the multipart boundary; setting this header manually can
+  // make the server receive an empty file even when the request returns success.
+  return api.put('/api/profile/avatar', form);
 }
 
 export function deleteAvatar() {

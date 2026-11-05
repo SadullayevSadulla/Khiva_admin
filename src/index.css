@@ -229,9 +229,6 @@ h1,h2,h3 {
   color: var(--text);
 }
 
-.table-panel .ant-table-tbody > tr:hover > td {
-  background: var(--teal-soft);
-}
 
 .table-panel .ant-pagination {
   padding: 0 16px;
