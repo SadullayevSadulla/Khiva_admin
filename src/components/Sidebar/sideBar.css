@@ -170,7 +170,7 @@
   overflow: hidden;
   font-size: 14px;
   font-weight: 600;
-  color: #f4ecda;
+  /* color: #f4ecda; */
   text-overflow: ellipsis;
   white-space: nowrap;
 }

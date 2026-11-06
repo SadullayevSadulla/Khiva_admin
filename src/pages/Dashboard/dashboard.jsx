@@ -108,7 +108,7 @@ export default function Dashboard() {
         <section className="panel feed">
           <h2 className="feed-heading">So'nggi yangiliklar</h2>
           {news.length ? (
-            news.slice(0, 3).map((item) => <FeedItem key={item.id} item={item} />)
+            news.map((item) => <FeedItem key={item.id} item={item} />)
           ) : (
             <p className="feed-empty">Hozircha yangiliklar yo'q.</p>
           )}
@@ -117,7 +117,7 @@ export default function Dashboard() {
         <section className="panel feed">
           <h2 className="feed-heading">So'nggi e'lonlar</h2>
           {announcements.length ? (
-            announcements.slice(0, 3).map((item) => <FeedItem key={item.id} item={item} />)
+            announcements.map((item) => <FeedItem key={item.id} item={item} />)
           ) : (
             <p className="feed-empty">Hozircha e'lonlar yo'q.</p>
           )}
