@@ -12,8 +12,23 @@ import Loader from "../../components/Loader/loader";
 const LANGS = ["en", "ru", "uz"];
 
 const mapNews = (item) => {
-  const pick = (field) =>
-    LANGS.reduce((acc, l) => ({ ...acc, [l]: item?.[field]?.[l] || "" }), {});
+  const pick = (field) => {
+    const sources = field === "content"
+      ? [item?.content, item?.description, item?.body, item?.text]
+      : [item?.[field]];
+
+    return LANGS.reduce((acc, lang) => {
+      const value = sources
+        .map((source) => {
+          if (typeof source === "string") return lang === "uz" ? source : "";
+          return source?.[lang] || (lang === "uz" ? source?.text || source?.value : "") || "";
+        })
+        .find(Boolean);
+      acc[lang] = value || "";
+      return acc;
+    }, {});
+  };
+
   return {
     values: {
       title: pick("title"),
@@ -47,7 +62,7 @@ export default function NewsAdd() {
   const isEdit = Boolean(id);
 
   const passed =
-    isEdit && state?.newsItem && String(state.newsItem.id) === String(id)
+    isEdit && state?.newsItem && String(state.newsItem.id ?? state.newsItem._id) === String(id)
       ? mapNews(state.newsItem)
       : null;
 
@@ -73,7 +88,7 @@ export default function NewsAdd() {
         try {
           const res = await api.get(`/api/admin/news/${id}`);
           let item = res.data?.data || res.data;
-          if (Array.isArray(item)) item = item.find((x) => String(x.id) === String(id));
+          if (Array.isArray(item)) item = item.find((x) => String(x.id ?? x._id) === String(id));
 
           if (item) {
             const mapped = mapNews(item);

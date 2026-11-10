@@ -7,7 +7,24 @@ import api, { fileUrl } from "../../api";
 import './news.css';
 import Loader from "../../components/Loader/loader";
 
-const stripHtml = (html = "") => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+const getLocalizedText = (value) => {
+  if (typeof value === "string") return value;
+  if (!value || typeof value !== "object") return "";
+
+  const localized = value.uz ?? value.text ?? value.value ?? value.ru ?? value.en;
+  return typeof localized === "string" ? localized : "";
+};
+
+const stripHtml = (html = "") =>
+  String(html).replace(/<[^>]*>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
+
+const getArticlePreview = (item) => {
+  const content = [item?.content, item?.description, item?.body, item?.text]
+    .map(getLocalizedText)
+    .map(stripHtml)
+    .find(Boolean);
+  return content?.substring(0, 140) || "";
+};
 
 export default function News() {
   const navigate = useNavigate();
@@ -28,8 +45,26 @@ export default function News() {
     try {
       const res = await api.get(`/api/admin/news?page=${page}`);
       const data = res.data?.data || res.data || [];
-      setNewsList(Array.isArray(data) ? data : []);
-      setTotalItems(res.data?.total || res.data?.count || data.length);
+      const list = Array.isArray(data) ? data : [];
+      const enrichedList = await Promise.all(list.map(async (item) => {
+        if (getArticlePreview(item)) return item;
+
+        const id = item.id ?? item._id;
+        if (!id) return item;
+
+        try {
+          const detailRes = await api.get(`/api/admin/news/${id}`);
+          let detail = detailRes.data?.data || detailRes.data;
+          if (Array.isArray(detail)) detail = detail.find((entry) => String(entry.id ?? entry._id) === String(id));
+          return detail && typeof detail === "object" ? { ...item, ...detail } : item;
+        } catch (detailError) {
+          console.error(`Yangilik matnini yuklashda xatolik (${id}):`, detailError);
+          return item;
+        }
+      }));
+
+      setNewsList(enrichedList);
+      setTotalItems(res.data?.total || res.data?.count || list.length);
       setError(null);
     } catch (err) {
       console.error(err);
@@ -85,7 +120,7 @@ export default function News() {
           {newsList.map((item) => {
             const mainImg = item.images?.find((img) => img.mainImage)?.url || item.images?.[0]?.url;
             const image = fileUrl(mainImg);
-            const text = stripHtml(item.content?.uz).substring(0, 140);
+            const text = getArticlePreview(item);
             return (
               <article key={item.id} className="news-card">
                 <div className="news-img-wrapper">

@@ -13,8 +13,23 @@ const LANGS = ["en", "ru", "uz"];
 
 // Serverdan kelgan e'lonni forma qiymatlariga o'tkazadi
 const mapElon = (item) => {
-  const pick = (field) =>
-    LANGS.reduce((acc, l) => ({ ...acc, [l]: item?.[field]?.[l] || "" }), {});
+  const pick = (field) => {
+    const sources = field === "content"
+      ? [item?.content, item?.description, item?.body, item?.text]
+      : [item?.[field]];
+
+    return LANGS.reduce((acc, lang) => {
+      const value = sources
+        .map((source) => {
+          if (typeof source === "string") return lang === "uz" ? source : "";
+          return source?.[lang] || (lang === "uz" ? source?.text || source?.value : "") || "";
+        })
+        .find(Boolean);
+      acc[lang] = value || "";
+      return acc;
+    }, {});
+  };
+
   return {
     values: {
       title: pick("title"),
@@ -50,7 +65,7 @@ export default function ElonlarAdd() {
 
   // Ro'yxatdan kelgan e'lon: forma darhol to'la ochiladi
   const passed =
-    isEdit && state?.elonItem && String(state.elonItem.id) === String(id)
+    isEdit && state?.elonItem && String(state.elonItem.id ?? state.elonItem._id) === String(id)
       ? mapElon(state.elonItem)
       : null;
 
@@ -76,7 +91,7 @@ export default function ElonlarAdd() {
         try {
           const res = await api.get(`/api/admin/announcement/${id}`);
           let item = res.data?.data || res.data;
-          if (Array.isArray(item)) item = item.find((x) => String(x.id) === String(id));
+          if (Array.isArray(item)) item = item.find((x) => String(x.id ?? x._id) === String(id));
 
           if (item) {
             const mapped = mapElon(item);
