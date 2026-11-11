@@ -21,6 +21,7 @@ const pageTitles = {
   '/collaction/add': "Kolleksiya qo'shish",
   '/profil': 'Profilim',
   '/requests': "So'rovlar",
+  '/chipta-tariflari':"Tikets"
 };
 
 function getTitle(pathname) {
@@ -49,7 +50,7 @@ export default function Header({ theme, onToggleTheme, onMenu }) {
 
       <div className="header-right">
         <button className="icon-btn" onClick={onToggleTheme} aria-label={label} title={label}>
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          {isDark ? <Sun size={20} /> : <Moon size={20} fill='#000'/>}
         </button>
       </div>
     </header>

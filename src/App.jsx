@@ -11,7 +11,6 @@ import Header from "./components/Header/header";
 import AddEmployee from "./pages/Xodimlar/AddEmployee";
 import Collaction from "./pages/Collaction/collaction";
 import CollactionAdd from "./pages/Collaction/collactionAdd";
-import Soon from "./pages/Soon/soon";
 import News from "./pages/News/news";
 import NewsAdd from "./pages/News/newsAdd";
 import Elonlar from "./pages/Elonlar/elonlar";
@@ -23,11 +22,8 @@ import AdminAdd from "./pages/admins/adminAdd";
 import Users from "./pages/Users/userrs";
 import Profile from "./pages/Profile/profile";
 import Requests from "./pages/requests/requests.jsx";
-
-const soonPaths = [
-  "/chipta-tariflari",
-  "/sotilgan-chiptalar",
-];
+import TiketsPage from "./pages/Tickets/TiketsPage/tiketsPage";
+import TiketsSeal from "./pages/Tickets/TiketsSeal/tiketsSeal";
 
 const antPalette = {
   light: { primary: "#c4501a", teal: "#137a8e", surface: "#ffffff", line: "#d6e0dd", text: "#14282e" },
@@ -116,9 +112,8 @@ function App() {
           <Route path="/profil" element={<Profile />} />
           <Route path="/sorovlar" element={<Requests />} />
           <Route path="/requests" element={<Requests />} />
-          {soonPaths.map((path) => (
-            <Route key={path} path={path} element={<Soon />} />
-          ))}
+          <Route path="/chipta-tariflari" element={<TiketsPage />} />
+          <Route path="/sotilgan-chiptalar" element={<TiketsSeal />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />

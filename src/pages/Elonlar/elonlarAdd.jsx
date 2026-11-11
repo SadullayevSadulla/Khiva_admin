@@ -11,7 +11,6 @@ import Loader from "../../components/Loader/loader";
 
 const LANGS = ["en", "ru", "uz"];
 
-// Serverdan kelgan e'lonni forma qiymatlariga o'tkazadi
 const mapElon = (item) => {
   const pick = (field) => {
     const sources = field === "content"
@@ -39,7 +38,6 @@ const mapElon = (item) => {
   };
 };
 
-// Serverdan kelgan xatoni o'qiladigan matnga aylantiradi
 const getErrorText = (err) => {
   const res = err.response;
   if (!res) {
@@ -63,7 +61,6 @@ export default function ElonlarAdd() {
   const { state } = useLocation();
   const isEdit = Boolean(id);
 
-  // Ro'yxatdan kelgan e'lon: forma darhol to'la ochiladi
   const passed =
     isEdit && state?.elonItem && String(state.elonItem.id ?? state.elonItem._id) === String(id)
       ? mapElon(state.elonItem)
@@ -118,7 +115,6 @@ export default function ElonlarAdd() {
       };
       loadElon();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isEdit, reset]);
 
   const copyToAllLanguages = () => {

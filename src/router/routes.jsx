@@ -9,6 +9,8 @@ import GalleryAdd from "../pages/Gallery/galleryAdd";
 import News from "../pages/News/news";
 import NewsAdd from "../pages/News/newsAdd";
 import Requests from "../pages/requests/requests";
+import TiketsPage from "../pages/Tickets/TiketsPage/tiketsPage";
+import TiketsSeal from "../pages/Tickets/TiketsSeal/tiketsSeal";
 import Xodimlar from "../pages/Xodimlar/xodimlar";
 
 export const router = [
@@ -71,5 +73,15 @@ export const router = [
         id:11,
         path:"/requests",
         element:<Requests/>
+    },
+    {
+        id: 12,
+        path: "/chipta-tariflari", 
+        element: <TiketsPage/>
+    },
+    {
+        id: 13,
+        path: "/sotilgan-chiptalar", 
+        element: <TiketsSeal/>
     }
 ]
