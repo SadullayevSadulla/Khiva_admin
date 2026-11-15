@@ -11,6 +11,9 @@ import Header from "./components/Header/header";
 import AddEmployee from "./pages/Xodimlar/AddEmployee";
 import Collaction from "./pages/Collaction/collaction";
 import CollactionAdd from "./pages/Collaction/collactionAdd";
+import TiketsPage from "./pages/Tickets/TiketsPage/tiketsPage";
+import TiketsAdd from "./pages/Tickets/TiketsAdd/tiketsAdd";
+import TiketsSeal from "./pages/Tickets/TiketsSeal/tiketsSeal";
 import News from "./pages/News/news";
 import NewsAdd from "./pages/News/newsAdd";
 import Elonlar from "./pages/Elonlar/elonlar";
@@ -22,8 +25,6 @@ import AdminAdd from "./pages/admins/adminAdd";
 import Users from "./pages/Users/userrs";
 import Profile from "./pages/Profile/profile";
 import Requests from "./pages/requests/requests.jsx";
-import TiketsPage from "./pages/Tickets/TiketsPage/tiketsPage";
-import TiketsSeal from "./pages/Tickets/TiketsSeal/tiketsSeal";
 
 const antPalette = {
   light: { primary: "#c4501a", teal: "#137a8e", surface: "#ffffff", line: "#d6e0dd", text: "#14282e" },
@@ -113,6 +114,8 @@ function App() {
           <Route path="/sorovlar" element={<Requests />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/chipta-tariflari" element={<TiketsPage />} />
+          <Route path="/chipta-tariflari/add" element={<TiketsAdd />} />
+          <Route path="/chipta-tariflari/add/:id" element={<TiketsAdd />} />
           <Route path="/sotilgan-chiptalar" element={<TiketsSeal />} />
         </Route>
 

@@ -31,30 +31,99 @@ export function getProfileName(profile) {
   return username && !String(username).includes('@') ? username : 'Profil';
 }
 
-export function getAvatarUrl(profile) {
-  const candidates = [
-    profile.avatar,
-    profile.avatarUrl,
-    profile.avatar_url,
-    profile.image,
-    profile.photo,
-    profile.photoUrl,
-    profile.photo_url,
-    profile.picture,
-    profile.profileImage,
-    profile.profile_image,
-    profile.profileImageUrl,
-    profile.profile_image_url,
-    profile.imageUrl,
-    profile.image_url,
-    profile.avatarPath,
-    profile.avatar_path,
-  ];
-  for (const item of candidates) {
-    const url = typeof item === 'string' ? item : item?.url;
-    if (url) return fileUrl(url);
+const AVATAR_KEY = /avatar|photo|image|picture|img|pic/i;
+const URL_KEYS = ['url', 'path', 'src', 'location', 'link', 'fileUrl', 'file_url'];
+
+const toUrl = (item) => {
+  if (typeof item === 'string') return item === 'string' ? '' : item;
+  if (item && typeof item === 'object') {
+    for (const key of URL_KEYS) {
+      if (typeof item[key] === 'string' && item[key]) return item[key];
+    }
   }
   return '';
+};
+
+const IMAGE_LIKE = /\.(png|jpe?g|webp|gif|avif)(\?.*)?$/i;
+
+// Server rasm manzilini qaysi nom bilan qaytarishidan qat'i nazar topadi
+function findAvatar(profile) {
+  const known = [
+    profile.avatar, profile.avatarUrl, profile.avatar_url, profile.image, profile.photo,
+    profile.photoUrl, profile.photo_url, profile.picture, profile.profileImage, profile.profile_image,
+    profile.profileImageUrl, profile.profile_image_url, profile.imageUrl, profile.image_url,
+    profile.avatarPath, profile.avatar_path,
+  ];
+  for (const item of known) {
+    const url = toUrl(item);
+    if (url) return url;
+  }
+  // Nomi noma'lum bo'lsa: avatar/photo/image... so'zi bor kalitlarni qidiramiz
+  for (const [key, value] of Object.entries(profile)) {
+    if (!AVATAR_KEY.test(key)) continue;
+    const url = toUrl(value);
+    if (url) return url;
+  }
+  // Oxirgi urinish: qiymati rasm fayliga o'xshagan istalgan maydon
+  for (const value of Object.values(profile)) {
+    if (typeof value === 'string' && IMAGE_LIKE.test(value)) return value;
+  }
+  return '';
+}
+
+// Server profil javobida rasm manzilini qaytarmasa, yuklash javobidagi manzilni
+// shu brauzerda eslab qolamiz (faqat vaqtinchalik yechim).
+const FALLBACK_PREFIX = 'avatar-fallback:';
+const fallbackKey = (profile) => {
+  const id = profile?.id || profile?.email || profile?.username;
+  return id ? `${FALLBACK_PREFIX}${id}` : '';
+};
+const readFallback = (profile) => {
+  try {
+    const key = fallbackKey(profile);
+    return key ? localStorage.getItem(key) || '' : '';
+  } catch {
+    return '';
+  }
+};
+export const saveAvatarFallback = (profile, url) => {
+  try {
+    const key = fallbackKey(profile);
+    if (key && url) localStorage.setItem(key, url);
+  } catch {
+    /* localStorage mavjud emas */
+  }
+};
+export const clearAvatarFallback = (profile) => {
+  try {
+    const key = fallbackKey(profile);
+    if (key) localStorage.removeItem(key);
+  } catch {
+    /* localStorage mavjud emas */
+  }
+};
+
+// Server profilining o'zi rasm manzilini qaytaryaptimi?
+export const hasServerAvatar = (profile) => Boolean(findAvatar(profile || {}));
+
+// PUT /api/profile/avatar javobidan rasm manzilini olish
+export function extractAvatarFromResponse(response) {
+  const body = response?.data;
+  if (!body || typeof body !== 'object') return '';
+  return findAvatar(unwrapProfile(body)) || toUrl(body) || toUrl(body.data) || '';
+}
+
+// Rasm o'zgarganda brauzer eski nusxani ko'rsatmasligi uchun versiya qo'shamiz
+function withVersion(url, profile) {
+  const version = profile.updatedAt || profile.updated_at;
+  if (!version || /^(blob:|data:)/i.test(url) || url.includes('?')) return url;
+  return `${url}?v=${encodeURIComponent(version)}`;
+}
+
+export function getAvatarUrl(profile) {
+  const safe = profile || {};
+  const raw = findAvatar(safe) || readFallback(safe);
+  return raw ? withVersion(fileUrl(raw), safe) : '';
 }
 
 export const getRole = (profile) =>
@@ -141,13 +210,39 @@ export function updateName({ firstName, lastName }) {
   ]);
 }
 
-export function uploadAvatar(file) {
-  const form = new FormData();
-  form.append('file', file);
+// Server faylni qaysi maydon nomi bilan kutishi noma'lum bo'lgani uchun,
+// bir nechta nomni ketma-ket sinab ko'ramiz.
+const AVATAR_FIELDS = ['file', 'avatar', 'image', 'photo'];
 
-  // Let the browser set the multipart boundary; setting this header manually can
-  // make the server receive an empty file even when the request returns success.
-  return api.put('/api/profile/avatar', form);
+// Server "success" desa ham, javobdagi user ichida rasm maydoni bor-u, bo'sh bo'lsa,
+// fayl qabul qilinmagan deb hisoblaymiz va keyingi maydon nomini sinaymiz.
+const avatarSlotIsEmpty = (response) => {
+  const user = unwrapProfile(response?.data);
+  if (!user || typeof user !== 'object') return false;
+  const hasSlot = Object.keys(user).some((key) => AVATAR_KEY.test(key));
+  return hasSlot && !findAvatar(user);
+};
+
+export async function uploadAvatar(file) {
+  let lastError;
+  let lastResponse;
+  for (const field of AVATAR_FIELDS) {
+    const form = new FormData();
+    form.append(field, file);
+    try {
+      // Content-Type ni qo'lda yozmang: brauzer multipart boundary ni o'zi qo'yadi.
+      const response = await api.put('/api/profile/avatar', form);
+      lastResponse = response;
+      if (!avatarSlotIsEmpty(response)) return response;
+      console.warn(`Avatar "${field}" maydoni bilan yuborildi, lekin javobda rasm bo'sh. Keyingisini sinayman.`, response.data);
+    } catch (error) {
+      if (!isShapeError(error)) throw error;
+      console.warn(`Avatar maydoni "${field}" rad etildi:`, error.response?.data);
+      lastError = error;
+    }
+  }
+  if (lastResponse) return lastResponse;
+  throw lastError;
 }
 
 export function deleteAvatar() {
@@ -166,9 +261,10 @@ export function changePassword({ current, next }) {
 export function requestEmailChange(newEmail) {
   return api.post('/api/profile/email/request', { email: newEmail });
 }
+
 export function confirmEmailChange({ code, newEmail }) {
-  return api.post('/api/profile/email/confirm', { 
-    otp: code,      
-    email: newEmail  
+  return api.post('/api/profile/email/confirm', {
+    otp: code,
+    email: newEmail,
   });
 }

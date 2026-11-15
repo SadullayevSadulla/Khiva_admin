@@ -14,6 +14,7 @@ const pageTitles = {
   '/galereya/add': "Rasm qo'shish",
   '/foydalanuvchilar': 'Foydalanuvchilar',
   '/chipta-tariflari': "Chipta ta'riflari",
+  '/chipta-tariflari/add': "Tarif qo'shish",
   '/sotilgan-chiptalar': 'Sotilgan chiptalar',
   '/adminlar': 'Adminlar',
   '/adminlar/add': "Admin qo'shish",
@@ -21,7 +22,6 @@ const pageTitles = {
   '/collaction/add': "Kolleksiya qo'shish",
   '/profil': 'Profilim',
   '/requests': "So'rovlar",
-  '/chipta-tariflari':"Tikets"
 };
 
 function getTitle(pathname) {
@@ -30,6 +30,7 @@ function getTitle(pathname) {
   if (pathname.startsWith('/collaction/add/')) return 'Kolleksiyani tahrirlash';
   if (pathname.startsWith('/news/add/')) return 'Yangilikni tahrirlash';
   if (pathname.startsWith('/elonlar/add/')) return "E'lonni tahrirlash";
+  if (pathname.startsWith('/chipta-tariflari/add/')) return 'Tarifni tahrirlash';
   if (pathname.startsWith('/adminlar/add/')) return 'Adminni tahrirlash';
   return pageTitles[pathname] || 'Bosh menyu';
 }

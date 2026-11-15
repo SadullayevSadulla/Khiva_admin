@@ -8,6 +8,7 @@ import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-zoom.css";
 import "lightgallery/css/lg-thumbnail.css";
 import Loader from "../../components/Loader/loader";
+import { useAuthImage } from "../../hooks/useAuthImage";
 import {
   fetchProfile,
   updateName,
@@ -19,6 +20,10 @@ import {
   getNameParts,
   getProfileName,
   getAvatarUrl,
+  hasServerAvatar,
+  extractAvatarFromResponse,
+  saveAvatarFallback,
+  clearAvatarFallback,
   getRole,
   getErrorMessage,
   notifyProfileChanged,
@@ -27,19 +32,15 @@ import "./profile.css";
 
 const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
-function Avatar({ profile, size = 88, previewUrl, busy, onUpload, onView, onDelete }) {
-  const url = previewUrl || getAvatarUrl(profile);
-  const [imageFailed, setImageFailed] = useState(false);
+function Avatar({ profile, size = 88, src, onImageError, busy, onUpload, onView, onDelete }) {
   const initial = getProfileName(profile).charAt(0).toUpperCase();
-  const hasAvatar = Boolean(url && !imageFailed);
-
-  useEffect(() => setImageFailed(false), [url]);
+  const hasAvatar = Boolean(src);
 
   return (
     <div className="pf-avatar-wrap" style={{ width: size, height: size }}>
       <div className="pf-avatar" aria-label={hasAvatar ? "Profil rasmi" : "Profil rasmi yo'q"}>
         {hasAvatar ? (
-          <img src={url} alt={getProfileName(profile)} onError={() => setImageFailed(true)} />
+          <img src={src} alt={getProfileName(profile)} onError={onImageError} />
         ) : (
           <span>{initial}</span>
         )}
@@ -83,9 +84,10 @@ function HeaderCard({ profile, onChanged }) {
   const galleryRef = useRef(null);
   const galleryInstanceRef = useRef(null);
   const avatarUrl = previewUrl || getAvatarUrl(profile);
+  const { src: avatarSrc, onError: onAvatarError } = useAuthImage(avatarUrl);
 
   useEffect(() => {
-    if (!galleryRef.current || !avatarUrl) return undefined;
+    if (!galleryRef.current || !avatarSrc) return undefined;
 
     const instance = lightGallery(galleryRef.current, {
       plugins: [lgZoom, lgThumbnail],
@@ -99,54 +101,76 @@ function HeaderCard({ profile, onChanged }) {
       instance.destroy();
       galleryInstanceRef.current = null;
     };
-  }, [avatarUrl]);
+  }, [avatarSrc]);
 
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
 
   const handleFile = async (event) => {
-    const file = event.target.files && event.target.files[0];
-    event.target.value = "";
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      message.error("Iltimos, rasm faylini tanlang!");
-      return;
-    }
-    if (file.size > MAX_AVATAR_SIZE) {
-      message.error("Rasm hajmi 5MB dan oshmasligi kerak!");
-      return;
-    }
-    setBusy(true);
-    try {
-      await uploadAvatar(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      message.success("Rasm yangilandi.");
-      await onChanged();
-    } catch (error) {
-      console.error("Rasm yuklashda xato:", error.response?.status, error.response?.data || error);
-      message.error(`Rasm yuklashda xatolik: ${getErrorMessage(error)}`, 8);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const file = event.target.files && event.target.files[0];
+  event.target.value = "";
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    message.error("Iltimos, rasm faylini tanlang!");
+    return;
+  }
+  if (file.size > MAX_AVATAR_SIZE) {
+    message.error("Rasm hajmi 5MB dan oshmasligi kerak!");
+    return;
+  }
+  setBusy(true);
+  try {
+    const res = await uploadAvatar(file);
+    console.info("PUT /api/profile/avatar javobi:", res.data);
 
-  const handleDelete = async () => {
-    setBusy(true);
-    try {
-      await deleteAvatar();
+    const uploadedUrl = extractAvatarFromResponse(res);
+    if (uploadedUrl) saveAvatarFallback(profile, uploadedUrl);
+
+    setPreviewUrl(URL.createObjectURL(file));
+    const fresh = await onChanged();
+    console.info("GET /api/profile (yuklashdan keyin):", fresh);
+
+    if (fresh && hasServerAvatar(fresh)) {
       setPreviewUrl("");
-      message.success("Rasm o'chirildi.");
-      setConfirmDelete(false);
-      await onChanged();
-    } catch (error) {
-      console.error("Rasmni o'chirishda xato:", error.response?.status, error.response?.data || error);
-      message.error(`Rasmni o'chirishda xatolik: ${getErrorMessage(error)}`, 8);
-    } finally {
-      setBusy(false);
+      message.success("Rasm yangilandi.");
+    } else if (fresh && getAvatarUrl(fresh)) {
+      setPreviewUrl("");
+      message.warning(
+        "Rasm saqlandi, lekin server profilda rasm manzilini qaytarmaydi. Rasm faqat shu brauzerda ko'rinadi. Backend dasturchisiga GET /api/profile javobiga avatar qo'shishni ayting.",
+        10
+      );
+    } else {
+      console.warn("Rasm yuklandi, lekin rasm manzili topilmadi. Profil:", fresh, "Yuklash javobi:", res.data);
+      message.warning(
+        "Rasm yuborildi, lekin server rasm manzilini qaytarmadi. Sahifani yangilasangiz rasm yo'qoladi. F12 → Console ni tekshiring.",
+        10
+      );
     }
-  };
+  } catch (error) {
+    console.error("Rasm yuklashda xato:", error.response?.status, error.response?.data || error);
+    message.error(`Rasm yuklashda xatolik: ${getErrorMessage(error)}`, 8);
+  } finally {
+    setBusy(false);
+  }
+};
 
+const handleDelete = async () => {
+  setBusy(true);
+  try {
+    await deleteAvatar();
+    clearAvatarFallback(profile);
+    setPreviewUrl("");
+    message.success("Rasm o'chirildi.");
+    setConfirmDelete(false);
+    await onChanged();
+  } catch (error) {
+    console.error("Rasmni o'chirishda xato:", error.response?.status, error.response?.data || error);
+    message.error(`Rasmni o'chirishda xatolik: ${getErrorMessage(error)}`, 8);
+  } finally {
+    setBusy(false);
+  }
+};
   const openAvatar = () => galleryInstanceRef.current?.openGallery(0);
 
   const role = getRole(profile);
@@ -156,16 +180,17 @@ function HeaderCard({ profile, onChanged }) {
       <Avatar
         profile={profile}
         size={96}
-        previewUrl={previewUrl}
+        src={avatarSrc}
+        onImageError={onAvatarError}
         busy={busy}
         onUpload={handleFile}
         onView={openAvatar}
         onDelete={() => setConfirmDelete(true)}
       />
-      {avatarUrl && (
+      {avatarSrc && (
         <div ref={galleryRef} className="pf-lightgallery-source" aria-hidden="true">
-          <a className="pf-lightgallery-item" href={avatarUrl} data-src={avatarUrl}>
-            <img src={avatarUrl} alt={getProfileName(profile)} />
+          <a className="pf-lightgallery-item" href={avatarSrc} data-src={avatarSrc}>
+            <img src={avatarSrc} alt={getProfileName(profile)} />
           </a>
         </div>
       )}
@@ -445,12 +470,15 @@ export default function Profile() {
 
   const loadProfile = async () => {
     try {
-      setProfile(await fetchProfile());
+      const data = await fetchProfile();
+      setProfile(data);
       setError("");
       notifyProfileChanged();
+      return data;
     } catch (err) {
       console.error("Profil:", err.response?.status, err.response?.data || err);
       setError(`Profilni yuklab bo'lmadi: ${getErrorMessage(err)}`);
+      return null;
     } finally {
       setLoading(false);
     }

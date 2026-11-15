@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { fetchProfile, getProfileName, getAvatarUrl } from '../../pages/Profile/profileApi.js';
+import { useAuthImage } from '../../hooks/useAuthImage';
 import './sideBar.css';
 import {
   Home,
@@ -26,7 +27,7 @@ const MENU = [
   { to: '/elonlar', label: "E'lonlar", icon: Megaphone },
   { to: '/galereya', label: 'Galereya', icon: ImageIcon },
   { to: '/foydalanuvchilar', label: 'Foydalanuvchilar', icon: Users },
-  { to: '/requests', label: 'Sorovlar', icon:Mail  },
+  { to: '/requests', label: 'Sorovlar', icon: Mail },
   { to: '/chipta-tariflari', label: "Chipta ta'riflari", icon: Ticket },
   { to: '/sotilgan-chiptalar', label: 'Sotilgan chiptalar', icon: CheckSquare },
   { to: '/adminlar', label: 'Adminlar', icon: UserCog },
@@ -52,6 +53,7 @@ const SideBar = ({ open = false, onClose }) => {
 
   const profileName = profile ? getProfileName(profile) : 'Profil';
   const avatarUrl = profile ? getAvatarUrl(profile) : '';
+  const { src: avatarSrc, onError: onAvatarError } = useAuthImage(avatarUrl);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -98,7 +100,11 @@ const SideBar = ({ open = false, onClose }) => {
         <div className="sidebar-footer">
           <NavLink to="/profil" onClick={onClose} className="user-profile" title="Profilim">
             <div className="avatar">
-              {avatarUrl ? <img src={avatarUrl} alt="" /> : profileName.charAt(0).toUpperCase()}
+              {avatarSrc ? (
+                <img src={avatarSrc} alt={profileName} onError={onAvatarError} />
+              ) : (
+                profileName.charAt(0).toUpperCase()
+              )}
             </div>
             <span className="user-name">{profileName}</span>
           </NavLink>
