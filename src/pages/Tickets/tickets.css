@@ -46,8 +46,6 @@
   transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
 
-
-
 .tkt-chip.is-active {
   color: #fff;
   background: var(--teal);

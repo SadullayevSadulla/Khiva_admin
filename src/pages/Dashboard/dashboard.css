@@ -4,49 +4,199 @@
   gap: 22px;
 }
 
+.dash-error {
+  margin: 0;
+  color: white;
+}
+
 .stats {
+  --purple: #9b7be0;
+  --blue: #4f8fe8;
+  --pink: #e0629a;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 16px;
 }
 
+.stat-hero,
 .stat {
+  position: relative;
+  overflow: hidden;
+  color: white;
+  background: var(--surface);
+  border-radius: 16px;
+}
+
+.stat-hero {
+  display: flex;
+  flex-direction: column;
+  grid-column: span 5;
+  grid-row: span 2;
+  min-height: 250px;
+}
+
+.stat-hero-mark {
+  position: absolute;
+  top: -18px;
+  right: -26px;
+  color: white;
+  opacity: 0.08;
+  pointer-events: none;
+  transform: rotate(-12deg);
+}
+
+.stat-hero-main {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 24px 26px;
+  color: white;
+  text-decoration: none;
+}
+
+.stat-hero-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: white;
+}
+
+.stat-hero-value {
+  margin: 12px 0 6px;
+  font-family: Marcellus, Georgia, serif;
+  font-size: 68px;
+  font-weight: 400;
+  line-height: 1;
+  color: white;
+}
+
+.stat-hero-note {
+  font-size: 13.5px;
+  color: white;
+}
+
+.stat-hero-sub {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 15px 26px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  text-decoration: none;
+  border-top: 2px dashed var(--line);
+}
+
+.stat-hero-sub svg {
+  color: white;
+}
+
+.stat-hero-sub span {
+  flex: 1;
+}
+
+.stat-hero-sub b {
+  font-family: Marcellus, Georgia, serif;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.stat-hero-sub::before,
+.stat-hero-sub::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  width: 22px;
+  height: 22px;
+  background: var(--bg);
+  /* border-top: 1px solid var(--line); */
+  /* border-right: 1px solid var(--line); */
+  transform: rotate(45deg);
+  /* border: 1px solid var(--line); */
+  border-radius: 50%;
+}
+
+.stat-hero-sub::before {
+  left: -9px;
+}
+
+.stat-hero-sub::after {
+  right: -12px;
+}
+
+.stat {
+  --tone: var(--teal);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  grid-column: span 3;
+  min-height: 118px;
+  padding: 16px 18px;
+  text-decoration: none;
+}
+
+.stat-wide {
+  grid-column: span 4;
+}
+
+.stat-teal { --tone: var(--teal); }
+.stat-accent { --tone: var(--accent); }
+.stat-ok { --tone: var(--ok); }
+.stat-purple { --tone: var(--purple); }
+.stat-blue { --tone: var(--blue); }
+.stat-pink { --tone: var(--pink); }
+
+.stat-mark {
+  position: absolute;
+  right: -16px;
+  bottom: -22px;
+  color: white;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.stat-top {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .stat-icon {
-  flex-shrink: 0;
-  width: 46px;
-  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  background: var(--teal-soft);
-  color: var(--teal);
+  width: 38px;
+  height: 38px;
+  color: white;
+  border-radius: 11px;
+}
+
+.stat-bottom {
+  position: relative;
+  margin-top: 14px;
 }
 
 .stat-value {
   font-family: Marcellus, Georgia, serif;
-  font-size: 30px;
+  font-size: 36px;
   line-height: 1;
   color: var(--text);
 }
 
 .stat-label {
-  margin-top: 4px;
+  margin-top: 5px;
   font-size: 13.5px;
   color: var(--muted);
 }
 
-.dash-error {
-  margin: 0;
-  color: var(--danger);
-}
-
+/* ===== So'nggi yangiliklar va e'lonlar ===== */
 .feeds {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -74,7 +224,7 @@
   flex-shrink: 0;
   width: 112px;
   height: 80px;
-  overflow: hidden;
+  /* overflow: hidden; */
   border-radius: 10px;
   background: var(--surface-2);
   display: flex;
@@ -128,23 +278,65 @@
   border-top: 1px solid var(--line);
 }
 
-@media (max-width: 1100px) {
+/* ===== Moslashuvchanlik ===== */
+@media (max-width: 1200px) {
   .stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
+  .stat-hero {
+    grid-column: span 6;
+    grid-row: auto;
+    min-height: 220px;
+  }
+
+  .stat,
+  .stat-wide {
+    grid-column: span 3;
+  }
+}
+
+@media (max-width: 1100px) {
   .feeds {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 560px) {
+  .stats {
+    gap: 12px;
+  }
+
   .stat {
+    min-height: 108px;
     padding: 14px;
+  }
+
+  .stat-value {
+    font-size: 30px;
+  }
+
+  .stat-hero-main {
+    padding: 20px;
+  }
+
+  .stat-hero-value {
+    font-size: 56px;
+  }
+
+  .stat-hero-sub {
+    padding: 14px 20px;
   }
 
   .feed-thumb {
     width: 88px;
     height: 68px;
+  }
+}
+
+@media (max-width: 380px) {
+  .stat,
+  .stat-wide {
+    grid-column: span 6;
   }
 }

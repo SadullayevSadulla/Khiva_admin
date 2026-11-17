@@ -12,7 +12,6 @@
   overflow: hidden;
   background: var(--surface);
   border-radius: 14px;
-  box-shadow: var(--shadow);
   cursor: pointer;
   transition: transform 0.15s, border-color 0.15s;
 }
